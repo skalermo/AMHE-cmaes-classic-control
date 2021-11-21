@@ -1,0 +1,111 @@
+\documentclass[12pt,a4paper]{article}
+
+% for polish language
+\usepackage{polski}
+
+% for some math symbols
+\usepackage{amssymb}
+
+% correct footnotes placement
+\usepackage[bottom]{footmisc}
+
+% for \say command
+\usepackage{dirtytalk}
+
+% change title of the bibliography
+\def\bibname{Referencje}\let\refname\bibname
+
+% for advanced math formulas
+\usepackage{mathtools}
+
+\usepackage{listings}
+
+% links
+\usepackage{hyperref}
+% \hypersetup{
+%     colorlinks,
+%     citecolor=black,
+%     filecolor=black,
+%     linkcolor=black,
+%     urlcolor=blue
+% }
+
+% image displaying
+\usepackage{subcaption}
+\usepackage{graphicx}
+
+\usepackage{multirow} 
+\usepackage{makecell}
+
+\title{Dokumentacja do projektu z AMHE}
+
+\author{Roman Moskalenko \and Pavel Tarashkevich}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\section{Treść zadania}
+
+\textbf{Zadanie 10.}\\
+
+Zaprojektuj algorytm ewolucyjny i zbadaj jego działanie w jednym z zadań zdefiniowanych w ramach środowiska OpenAI poświęconym kontroli.
+
+Specyfikacja zadań znajduje się pod poniższym linkiem:
+
+\href{https://gym.openai.com/envs/#classic\_control}{gym.openai.com/envs/\#classic\_control}
+
+Porównaj wyniki swojego rozwiązania z dwoma wybranymi rozwiązaniami, które bazują na
+innych podejściach.
+
+
+\section{Projekt wstępny}
+
+\subsection{Opis problemu i jego sposób rozwiązania}
+
+Zadania kontroli klasycznej zakładają sterowanie obiektu fizycznego w sposób, 
+jak najbardziej efektywny dla jego stanu. Funkcja sterowania może być bardzo
+skomplikowana, uciążliwe jest jej zaprojektowanie w sposób ręczny. 
+
+Algorytmy uczenia się ze wzmocnieniem (dalej RL) są wykorzystywane w zadaniach związanych z kontrolą.
+Do ewaluacji tych algorytmów powstał zestaw środowisk OpenAI gym.
+
+Alternatywnym podejściem do zadań kontroli jest bezpośrednie stosowanie sieci 
+neuronowych, m.i. podejście neuroewolucji zastosowane w \cite{scalable_alternative}, 
+które zakłada połączenie sieci neuronowych i algorytmów ewolucyjnych.
+
+Do rozwiązania tego problemu planujemy zastosować sieć MLP, gdzie wejściem sieci
+będzie stan rozważanego środowiska, a wyjściem będzie akcja do wyboru przez agenta.
+Sieć ta będzie optymalizowana za pomocą algorytmu ewolucyjnego CMA-ES.
+
+\subsection{Planowane eksperymenty numeryczne}
+
+W ramach eksperymentów ocenimy działanie implementacji naszego algorytmu 
+neuroewolucji na różnych środowiskach OpenAI gym.
+
+Następnie porównamy jego działanie z dwoma algorytmami RL pod kątem 
+końcowej nagrody oraz czasu uczenia algorytmu. Wybrane przez nas 
+algorytmy RL to A2C oraz PPO.
+
+
+\subsection{Biblioteki wybrane do realizacji projektu}
+
+\begin{itemize}
+  \item \textbf{\href{https://github.com/openai/gym}{gym}} - liczne środowiska, w tym kontroli klasycznej, 
+  do trenowania agentów.
+  \item \textbf{\href{https://github.com/CyberAgentAILab/cmaes}{cmaes}} - 
+  implementacja algorytmu CMA-ES.
+  \item \textbf{\href{https://github.com/DLR-RM/stable-baselines3}{stable-baselines}} -
+  biblioteka zawierająca gotowe implementację algorytmów RL.
+\end{itemize}
+
+\begin{thebibliography}{9}
+\bibitem{scalable_alternative} 
+Tim Salimans, Jonathan Ho, Xi Chen, Szymon Sidor, Ilya Sutskever,\\
+Evolution Strategies as a Scalable Alternative to Reinforcement Learning,
+2017, \href{https://arxiv.org/pdf/1703.03864v1.pdf}{https://arxiv.org/pdf/1703.03864v1.pdf}
+
+\end{thebibliography}
+  
+\end{document}
