@@ -36,16 +36,16 @@ def main():
         'MountainCarContinuous-v0': 'continuous',
         'Pendulum-v1': 'continuous',
     }
-    env_name = 'CartPole-v0'
+    env_name = 'MountainCarContinuous-v0'
     env = gym.make(env_name)
     env.reset()
 
     global continuous
-    actions = env.action_space.n
     if env_to_action_type[env_name] == 'continuous':
         actions = env.action_space.shape[0]
         continuous = True
     else:
+        actions = env.action_space.n
         continuous = False
 
     print(actions)
