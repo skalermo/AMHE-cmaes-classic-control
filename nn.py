@@ -1,24 +1,23 @@
 from typing import Union
-from math import prod
+from math import prod, sqrt
 
 import numpy as np
 import torch
 from torch import nn
 import torch.nn.functional as F
 
+from cmaes_agent import ActionType
+
 
 class NN(nn.Module):
-    action_types = ['discrete', 'continuous']
-
-    def __init__(self, inputs: int, outputs: int = 1, action_type: str = 'discrete'):
-        assert action_type in NN.action_types, 'Unknown output type.'
+    def __init__(self, inputs: int, outputs: int = 1, action_type: ActionType = ActionType.Discrete):
         self.action_type = action_type
 
         super().__init__()
-        self.fc1 = nn.Linear(inputs, inputs * 2, bias=False)
-        self.fc2 = nn.Linear(2 * inputs, 2 * inputs, bias=False)
-        self.fc3 = nn.Linear(inputs * 2, outputs, bias=False)
-        self.submodules = [self.fc1, self.fc2, self.fc3]
+        hidden_neurons = round(sqrt(inputs * outputs)) + 1
+        self.fc1 = nn.Linear(inputs, hidden_neurons, bias=False)
+        self.fc2 = nn.Linear(hidden_neurons, outputs, bias=False)
+        self.submodules = [self.fc1, self.fc2]
 
         for param in self.parameters():
             param.requires_grad = False
@@ -30,10 +29,9 @@ class NN(nn.Module):
 
         x = state
         x = F.relu(self.fc1(x))
-        x = F.relu(self.fc2(x))
-        x = self.fc3(x)
+        x = self.fc2(x)
 
-        if self.action_type == 'discrete':
+        if self.action_type == ActionType.Discrete:
             x = F.softmax(x, dim=1)
             x = x.squeeze().tolist()
             max_val = max(x)
