@@ -1,5 +1,5 @@
 from typing import Union
-from math import prod, sqrt
+from math import prod
 
 import numpy as np
 import torch

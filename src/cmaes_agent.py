@@ -5,7 +5,7 @@ import gym
 import numpy as np
 from cmaes import CMA
 
-from nn import NN
+from src.nn import NN
 from env_info import ActionType, env_to_action_type
 
 

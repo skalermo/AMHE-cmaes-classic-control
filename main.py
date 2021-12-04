@@ -1,6 +1,6 @@
 import gym
 
-from cmaes_agent import CMAESAgent
+from src.cmaes_agent import CMAESAgent
 
 
 def main():

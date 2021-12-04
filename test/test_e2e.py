@@ -3,7 +3,7 @@ import os
 
 import gym
 
-from cmaes_agent import CMAESAgent
+from src.cmaes_agent import CMAESAgent
 from env_info import env_to_action_type
 
 
