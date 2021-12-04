@@ -1,4 +1,5 @@
 import pickle
+from typing import Callable, Union
 
 import gym
 import numpy as np
@@ -9,7 +10,9 @@ from env_info import ActionType, env_to_action_type
 
 
 class CMAESAgent:
-    def __init__(self, env_id: str, cmaes_sigma: float = 1.3, cmaes_population_size: int = 30, seed: int = 0):
+    def __init__(self, env_id: str, mlp_hidden_layers=1, seed: int = 0,
+                 cmaes_sigma: float = 1.3, cmaes_population_size: int = 30,
+                 model: NN = None):
         if env_to_action_type.get(env_id) is not None:
             self.action_type = env_to_action_type.get(env_id)
             self.env = gym.make(env_id)
@@ -17,20 +20,26 @@ class CMAESAgent:
             raise 'Provided unknown environment'
 
         self.seed = seed
-        self.model = self._create_nn(self.env, self.action_type)
+        self.create_nn: Callable = lambda: self._create_nn(self.env, self.action_type, mlp_hidden_layers)
+        if model is not None:
+            self.model = model
+        else:
+            self.model = self.create_nn()
         self.optimizer = CMA(
             mean=np.zeros(self.model.parameters_count()),
             sigma=cmaes_sigma, population_size=cmaes_population_size, seed=self.seed
         )
+        print(self)
+        print(f'MLP: {mlp_hidden_layers=}, parameters={self.model.parameters_count()}')
 
     @staticmethod
-    def _create_nn(env: gym.Env, action_type: ActionType):
+    def _create_nn(env: gym.Env, action_type: ActionType, hidden: int) -> NN:
         state_size = env.observation_space.shape[0]
         if action_type == ActionType.Continuous:
             actions_size = env.action_space.shape[0]
         else:
             actions_size = env.action_space.n
-        return NN(state_size, actions_size, action_type)
+        return NN(state_size, actions_size, action_type, hidden)
 
     def learn(self, total_episodes: int = 500, episode_length: int = 1000):
         def _evaluate_model(_model: NN, env: gym.Env) -> int:
@@ -47,7 +56,7 @@ class CMAESAgent:
                     break
             return end_reward
 
-        model = self._create_nn(self.env, self.action_type)
+        model = self.create_nn()
         best_weights = None
         best_reward = -1e12
 
@@ -67,10 +76,11 @@ class CMAESAgent:
             print(f'{e=} {best_reward=} avg_reward={sum(rewards) / len(rewards)}')
         self.model.set_weights(best_weights)
 
-    def predict(self, observation: np.ndarray):
+    def predict(self, observation: np.ndarray) -> Union[int, list]:
         return self.model.map_to_action(observation)
 
     def save(self, path):
+        self.create_nn = None
         with open(path, 'wb') as f:
             pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
 

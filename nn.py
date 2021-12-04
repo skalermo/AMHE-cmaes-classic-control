@@ -6,19 +6,32 @@ import torch
 from torch import nn
 import torch.nn.functional as F
 
-from cmaes_agent import ActionType
+from env_info import ActionType
 
 
 class NN(nn.Module):
-    def __init__(self, inputs: int, outputs: int = 1, action_type: ActionType = ActionType.Discrete):
+    def __init__(self, inputs: int, outputs: int = 1, action_type: ActionType = ActionType.Discrete, hidden: int = 1):
         self.action_type = action_type
 
         super().__init__()
-        hidden_neurons = round(sqrt(inputs * outputs)) + 1
-        self.fc1 = nn.Linear(inputs, hidden_neurons, bias=False)
-        self.fc2 = nn.Linear(hidden_neurons, outputs, bias=False)
-        self.submodules = [self.fc1, self.fc2]
+        self.model = self._build_model(inputs, outputs, hidden)
+        self._disable_grad()
 
+    @staticmethod
+    def _build_model(inputs: int, outputs: int, hidden: int) -> nn.Sequential:
+        layers = []
+        hidden_neurons = round(sqrt(inputs * outputs)) + 1
+        _inputs = inputs
+        for i in range(hidden):
+            _outputs = hidden_neurons
+            layers.append(nn.Linear(_inputs, _outputs, bias=False))
+            layers.append(nn.ReLU())
+            _inputs = hidden_neurons
+        _outputs = outputs
+        layers.append(nn.Linear(_inputs, _outputs, bias=False))
+        return nn.Sequential(*layers)
+
+    def _disable_grad(self):
         for param in self.parameters():
             param.requires_grad = False
 
@@ -28,8 +41,7 @@ class NN(nn.Module):
             state = torch.from_numpy(state).float()
 
         x = state
-        x = F.relu(self.fc1(x))
-        x = self.fc2(x)
+        x = self.model(x)
 
         if self.action_type == ActionType.Discrete:
             x = F.softmax(x, dim=1)
@@ -49,7 +61,7 @@ class NN(nn.Module):
         assert len(w) == self.parameters_count(), 'Weights count mismatch.'
 
         idx = 0
-        for m in self.submodules:
+        for m in self.model.modules():
             if isinstance(m, nn.Linear):
                 idx = self._set_weights(m, w[idx:])
 
