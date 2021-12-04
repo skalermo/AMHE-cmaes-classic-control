@@ -10,17 +10,28 @@ from env_info import ActionType
 
 
 class NN(nn.Module):
-    def __init__(self, inputs: int, outputs: int = 1, action_type: ActionType = ActionType.Discrete, hidden: int = 1):
-        self.action_type = action_type
-
+    def __init__(self, inputs: int, outputs: int = 1, action_type: ActionType = ActionType.Discrete,
+                 max_nn_parameters: Union[str, int] = 'standard'):
         super().__init__()
-        self.model = self._build_model(inputs, outputs, hidden)
+
+        self.action_type = action_type
+        self.model = self._build_model(inputs, outputs, max_nn_parameters)
+        self.hidden = len(list(self.model.modules())) // 2
         self._disable_grad()
 
     @staticmethod
-    def _build_model(inputs: int, outputs: int, hidden: int) -> nn.Sequential:
+    def _build_model(inputs: int, outputs: int, max_nn_parameters: Union[str, int]) -> nn.Sequential:
+        hidden_neurons = min(2 * (inputs + outputs), 8)
+        if max_nn_parameters == 'standard':
+            hidden = 1
+        elif max_nn_parameters == 'minimal':
+            hidden = 0
+        elif isinstance(max_nn_parameters, int):
+            hidden = max((max_nn_parameters - (inputs + outputs) * hidden_neurons) // hidden_neurons**2 + 1, 0)
+        else:
+            raise f'Invalid {max_nn_parameters=}'
+
         layers = []
-        hidden_neurons = round(sqrt(inputs * outputs)) + 1
         _inputs = inputs
         for i in range(hidden):
             _outputs = hidden_neurons

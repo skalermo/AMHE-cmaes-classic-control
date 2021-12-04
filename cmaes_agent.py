@@ -10,7 +10,7 @@ from env_info import ActionType, env_to_action_type
 
 
 class CMAESAgent:
-    def __init__(self, env_id: str, mlp_hidden_layers=1, seed: int = 0,
+    def __init__(self, env_id: str, max_nn_params: Union[str, int] = 'standard', seed: int = 0,
                  cmaes_sigma: float = 1.3, cmaes_population_size: int = 30,
                  model: NN = None):
         if env_to_action_type.get(env_id) is not None:
@@ -20,7 +20,7 @@ class CMAESAgent:
             raise 'Provided unknown environment'
 
         self.seed = seed
-        self.create_nn: Callable = lambda: self._create_nn(self.env, self.action_type, mlp_hidden_layers)
+        self.create_nn: Callable = lambda: self._create_nn(self.env, self.action_type, max_nn_params)
         if model is not None:
             self.model = model
         else:
@@ -29,17 +29,20 @@ class CMAESAgent:
             mean=np.zeros(self.model.parameters_count()),
             sigma=cmaes_sigma, population_size=cmaes_population_size, seed=self.seed
         )
-        print(self)
-        print(f'MLP: {mlp_hidden_layers=}, parameters={self.model.parameters_count()}')
 
     @staticmethod
-    def _create_nn(env: gym.Env, action_type: ActionType, hidden: int) -> NN:
+    def _extract_env_info(env: gym.Env, action_type: ActionType) -> tuple:
         state_size = env.observation_space.shape[0]
         if action_type == ActionType.Continuous:
             actions_size = env.action_space.shape[0]
         else:
             actions_size = env.action_space.n
-        return NN(state_size, actions_size, action_type, hidden)
+        return state_size, actions_size
+
+    @staticmethod
+    def _create_nn(env: gym.Env, action_type: ActionType, max_nn_parameters: Union[str, int]) -> NN:
+        state_size, actions_size = CMAESAgent._extract_env_info(env, action_type)
+        return NN(state_size, actions_size, action_type, max_nn_parameters)
 
     def learn(self, total_episodes: int = 500, episode_length: int = 1000):
         def _evaluate_model(_model: NN, env: gym.Env) -> int:
