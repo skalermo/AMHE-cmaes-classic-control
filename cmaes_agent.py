@@ -12,7 +12,9 @@ from env_info import ActionType, env_to_action_type
 class CMAESAgent:
     def __init__(self, env_id: str, max_nn_params: Union[str, int] = 'standard', seed: int = 0,
                  cmaes_sigma: float = 1.3, cmaes_population_size: int = 30,
-                 model: NN = None):
+                 model: NN = None, verbose=False):
+        self.env_id = env_id
+        self.verbose = verbose
         if env_to_action_type.get(env_id) is not None:
             self.action_type = env_to_action_type.get(env_id)
             self.env = gym.make(env_id)
@@ -29,6 +31,13 @@ class CMAESAgent:
             mean=np.zeros(self.model.parameters_count()),
             sigma=cmaes_sigma, population_size=cmaes_population_size, seed=self.seed
         )
+        if verbose:
+            self.info()
+
+    def info(self):
+        print(self.env_id, self._extract_env_info(self.env, self.action_type))
+        print(self.model)
+        print(f'NN: hidden={self.model.hidden}, parameters={self.model.parameters_count()}')
 
     @staticmethod
     def _extract_env_info(env: gym.Env, action_type: ActionType) -> tuple:
@@ -76,7 +85,8 @@ class CMAESAgent:
                     best_weights = w
                 solutions.append((w, -reward_obtained))
             self.optimizer.tell(solutions)
-            print(f'{e=} {best_reward=} avg_reward={sum(rewards) / len(rewards)}')
+            if self.verbose:
+                print(f'{e=} {best_reward=} avg_reward={sum(rewards) / len(rewards)}')
         self.model.set_weights(best_weights)
 
     def predict(self, observation: np.ndarray) -> Union[int, list]:
