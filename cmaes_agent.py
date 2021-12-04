@@ -80,7 +80,10 @@ class CMAESAgent:
         self.model.set_weights(best_weights)
 
     def predict(self, observation: np.ndarray) -> Union[int, list]:
-        return self.model.map_to_action(observation)
+        action = self.model.map_to_action(observation)
+        if self.action_type == ActionType.Continuous:
+            action = [action]
+        return action
 
     def save(self, path):
         self.create_nn = None
