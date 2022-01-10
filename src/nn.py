@@ -1,5 +1,5 @@
 from typing import Union
-from math import prod
+import math
 
 import numpy as np
 import torch
@@ -80,8 +80,8 @@ class NN(nn.Module):
     def _set_weights(module: nn.Linear, w: np.ndarray, start_idx: int = 0) -> int:
         weights_shape = module.weight.data.shape
         bias_shape = module.bias.data.shape
-        weights_count = prod(weights_shape)
-        bias_count = prod(bias_shape)
+        weights_count = math.prod(weights_shape)
+        bias_count = math.prod(bias_shape)
         end_idx = start_idx + weights_count + bias_count
         weights = np.reshape(w[start_idx:end_idx - bias_count], weights_shape)
         bias = np.reshape(w[end_idx - bias_count: end_idx], bias_shape)
