@@ -35,11 +35,11 @@ class NN(nn.Module):
         _inputs = inputs
         for i in range(hidden):
             _outputs = hidden_neurons
-            layers.append(nn.Linear(_inputs, _outputs, bias=False))
+            layers.append(nn.Linear(_inputs, _outputs, bias=True))
             layers.append(nn.ReLU())
             _inputs = hidden_neurons
         _outputs = outputs
-        layers.append(nn.Linear(_inputs, _outputs, bias=False))
+        layers.append(nn.Linear(_inputs, _outputs, bias=True))
         return nn.Sequential(*layers)
 
     def _disable_grad(self):
@@ -78,8 +78,13 @@ class NN(nn.Module):
 
     @staticmethod
     def _set_weights(module: nn.Linear, w: np.ndarray, start_idx: int = 0) -> int:
-        shape = module.weight.data.shape
-        weights_count = prod(shape)
-        weights = np.reshape(w[start_idx:start_idx + weights_count], shape)
+        weights_shape = module.weight.data.shape
+        bias_shape = module.bias.data.shape
+        weights_count = prod(weights_shape)
+        bias_count = prod(bias_shape)
+        end_idx = start_idx + weights_count + bias_count
+        weights = np.reshape(w[start_idx:end_idx - bias_count], weights_shape)
+        bias = np.reshape(w[end_idx - bias_count: end_idx], bias_shape)
         module.weight = nn.Parameter(torch.from_numpy(weights).float())
+        module.bias = nn.Parameter(torch.from_numpy(bias).float())
         return start_idx + weights_count
