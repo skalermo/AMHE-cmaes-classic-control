@@ -69,9 +69,8 @@ class CMAESAgent:
             return end_reward
 
         model = self.create_nn()
-        best_weights = None
-        best_reward = -1e12
 
+        best_offspring = None
         for e in range(total_episodes):
             solutions = []
             rewards = []
@@ -80,14 +79,13 @@ class CMAESAgent:
                 model.set_weights(w)
                 reward_obtained = _evaluate_model(model, self.env)
                 rewards.append(reward_obtained)
-                if reward_obtained > best_reward:
-                    best_reward = reward_obtained
-                    best_weights = w
                 solutions.append((w, -reward_obtained))
             self.optimizer.tell(solutions)
+            best_offspring = max(solutions, key=lambda s: -s[1])
             if self.verbose:
+                best_reward = -best_offspring[1]
                 print(f'{e=} {best_reward=} avg_reward={sum(rewards) / len(rewards)}')
-        self.model.set_weights(best_weights)
+        self.model.set_weights(best_offspring[0])
 
     def predict(self, observation: np.ndarray) -> Union[int, list]:
         action = self.model.map_to_action(observation)
