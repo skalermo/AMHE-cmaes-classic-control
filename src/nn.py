@@ -20,20 +20,29 @@ class NN(nn.Module):
         self._disable_grad()
 
     @staticmethod
+    def _calculate_hidden_layers_count(inputs: int, outputs: int, max_nn_parameters: int, hidden_neurons: int):
+        hidden_parameters = max(max_nn_parameters - (inputs + 1) * hidden_neurons - (hidden_neurons + 1) * outputs, 0)
+        if hidden_parameters == 0:
+            hidden = 0
+        else:
+            hidden = hidden_parameters // ((hidden_neurons + 1) * hidden_neurons) + 1
+        return hidden
+
+    @staticmethod
     def _build_model(inputs: int, outputs: int, max_nn_parameters: Union[str, int]) -> nn.Sequential:
         hidden_neurons = min(2 * (inputs + outputs), 8)
         if max_nn_parameters == 'standard':
-            hidden = 1
+            hidden_layers_count = 1
         elif max_nn_parameters == 'minimal':
-            hidden = 0
+            hidden_layers_count = 0
         elif isinstance(max_nn_parameters, int):
-            hidden = max((max_nn_parameters - (inputs + outputs) * hidden_neurons) // hidden_neurons**2 + 1, 0)
+            hidden_layers_count = NN._calculate_hidden_layers_count(inputs, outputs, max_nn_parameters, hidden_neurons)
         else:
             raise f'Invalid {max_nn_parameters=}'
 
         layers = []
         _inputs = inputs
-        for i in range(hidden):
+        for i in range(hidden_layers_count):
             _outputs = hidden_neurons
             layers.append(nn.Linear(_inputs, _outputs, bias=True))
             layers.append(nn.ReLU())
