@@ -1,5 +1,5 @@
 from typing import Union
-from math import prod
+import math
 
 import numpy as np
 import torch
@@ -20,26 +20,35 @@ class NN(nn.Module):
         self._disable_grad()
 
     @staticmethod
+    def _calculate_hidden_layers_count(inputs: int, outputs: int, max_nn_parameters: int, hidden_neurons: int):
+        hidden_parameters = max(max_nn_parameters - (inputs + 1) * hidden_neurons - (hidden_neurons + 1) * outputs, 0)
+        if hidden_parameters == 0:
+            hidden = 0
+        else:
+            hidden = hidden_parameters // ((hidden_neurons + 1) * hidden_neurons) + 1
+        return hidden
+
+    @staticmethod
     def _build_model(inputs: int, outputs: int, max_nn_parameters: Union[str, int]) -> nn.Sequential:
         hidden_neurons = min(2 * (inputs + outputs), 8)
         if max_nn_parameters == 'standard':
-            hidden = 1
+            hidden_layers_count = 1
         elif max_nn_parameters == 'minimal':
-            hidden = 0
+            hidden_layers_count = 0
         elif isinstance(max_nn_parameters, int):
-            hidden = max((max_nn_parameters - (inputs + outputs) * hidden_neurons) // hidden_neurons**2 + 1, 0)
+            hidden_layers_count = NN._calculate_hidden_layers_count(inputs, outputs, max_nn_parameters, hidden_neurons)
         else:
             raise f'Invalid {max_nn_parameters=}'
 
         layers = []
         _inputs = inputs
-        for i in range(hidden):
+        for i in range(hidden_layers_count):
             _outputs = hidden_neurons
-            layers.append(nn.Linear(_inputs, _outputs, bias=False))
+            layers.append(nn.Linear(_inputs, _outputs, bias=True))
             layers.append(nn.ReLU())
             _inputs = hidden_neurons
         _outputs = outputs
-        layers.append(nn.Linear(_inputs, _outputs, bias=False))
+        layers.append(nn.Linear(_inputs, _outputs, bias=True))
         return nn.Sequential(*layers)
 
     def _disable_grad(self):
@@ -74,12 +83,20 @@ class NN(nn.Module):
         idx = 0
         for m in self.model.modules():
             if isinstance(m, nn.Linear):
-                idx = self._set_weights(m, w[idx:])
+                idx += self._set_weights(m, w[idx:])
 
     @staticmethod
-    def _set_weights(module: nn.Linear, w: np.ndarray, start_idx: int = 0) -> int:
-        shape = module.weight.data.shape
-        weights_count = prod(shape)
-        weights = np.reshape(w[start_idx:start_idx + weights_count], shape)
+    def _set_weights(module: nn.Linear, w: np.ndarray) -> int:
+        start_idx = 0
+        weights_shape = module.weight.data.shape
+        bias_shape = module.bias.data.shape
+        weights_count = math.prod(weights_shape)
+        bias_count = math.prod(bias_shape)
+        end_idx = start_idx + weights_count + bias_count
+        assert end_idx <= len(w), 'Weights count mismatch.'
+
+        weights = np.reshape(w[start_idx:end_idx - bias_count], weights_shape)
+        bias = np.reshape(w[end_idx - bias_count: end_idx], bias_shape)
         module.weight = nn.Parameter(torch.from_numpy(weights).float())
-        return start_idx + weights_count
+        module.bias = nn.Parameter(torch.from_numpy(bias).float())
+        return end_idx
