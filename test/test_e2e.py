@@ -38,25 +38,27 @@ class E2E(unittest.TestCase):
                 break
         self.assertTrue(done or i == 100 - 1)
 
-    def test_can_save_load_in_every_env(self):
+    def test_can_save_load_in_every_env_for_every_param_config(self):
         model_path = '.test_model'
+        params_configs = ['minimal', 'standard', 100]
 
-        def _train_save_load_run(env_id):
-            model = CMAESAgent(env_id, cmaes_population_size=5, max_nn_params='minimal')
+        def _train_save_load_run(_env_id, _config):
+            model = CMAESAgent(_env_id, cmaes_population_size=5, max_nn_params=_config)
             model.learn(total_episodes=1)
             model.save(model_path)
             del model
             model = CMAESAgent.load(model_path)
-            env = gym.make(env_id)
+            env = gym.make(_env_id)
             obs = env.reset()
             action = model.predict(obs)
             env.step(action)
 
         for env_id in env_to_action_type.keys():
-            try:
-                _train_save_load_run(env_id)
-            except Exception as e:
-                self.fail(f'{e=}')
+            for config in params_configs:
+                try:
+                    _train_save_load_run(env_id, config)
+                except Exception as e:
+                    self.fail(f'{e=}')
         try:
             os.remove(model_path)
         except FileNotFoundError:

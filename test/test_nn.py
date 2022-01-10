@@ -70,6 +70,19 @@ class TestNN(unittest.TestCase):
         self.assertTrue(all(x == 1 for x in [*m2.weight.data, *m2.bias.data]))
         self.assertTrue(all(x == 0 for x in [*m3.weight.data, *m3.bias.data]))
 
+    def test_param_count_not_exceed_max(self):
+        model = NN(2, 3, max_nn_parameters=50)
+        self.assertTrue(model.parameters_count() <= 50)  # 9
+
+        model = NN(2, 3, max_nn_parameters=100)
+        self.assertTrue(model.parameters_count() <= 100)  # 51
+
+        model = NN(2, 3, max_nn_parameters=150)
+        self.assertTrue(model.parameters_count() <= 150)  # 123
+
+        model = NN(2, 3, max_nn_parameters=200)
+        self.assertTrue(model.parameters_count() <= 200)  # 195
+
 
 if __name__ == '__main__':
     unittest.main()
