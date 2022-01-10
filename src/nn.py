@@ -74,17 +74,20 @@ class NN(nn.Module):
         idx = 0
         for m in self.model.modules():
             if isinstance(m, nn.Linear):
-                idx = self._set_weights(m, w[idx:])
+                idx += self._set_weights(m, w[idx:])
 
     @staticmethod
-    def _set_weights(module: nn.Linear, w: np.ndarray, start_idx: int = 0) -> int:
+    def _set_weights(module: nn.Linear, w: np.ndarray) -> int:
+        start_idx = 0
         weights_shape = module.weight.data.shape
         bias_shape = module.bias.data.shape
         weights_count = math.prod(weights_shape)
         bias_count = math.prod(bias_shape)
         end_idx = start_idx + weights_count + bias_count
+        assert end_idx <= len(w), 'Weights count mismatch.'
+
         weights = np.reshape(w[start_idx:end_idx - bias_count], weights_shape)
         bias = np.reshape(w[end_idx - bias_count: end_idx], bias_shape)
         module.weight = nn.Parameter(torch.from_numpy(weights).float())
         module.bias = nn.Parameter(torch.from_numpy(bias).float())
-        return start_idx + weights_count
+        return end_idx
