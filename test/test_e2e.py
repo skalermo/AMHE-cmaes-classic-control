@@ -18,10 +18,11 @@ class E2E(unittest.TestCase):
             env.step(action)
 
         for env_id in env_to_action_type.keys():
-            try:
-                _run_in_env(env_id)
-            except Exception as e:
-                self.fail(f'{e=}')
+            with self.subTest(f'in env {env_id}'):
+                try:
+                    _run_in_env(env_id)
+                except Exception as e:
+                    self.fail(f'{e=}')
 
     def test_reaches_end_of_env(self):
         env_id = 'CartPole-v0'
@@ -55,10 +56,11 @@ class E2E(unittest.TestCase):
 
         for env_id in env_to_action_type.keys():
             for config in params_configs:
-                try:
-                    _train_save_load_run(env_id, config)
-                except Exception as e:
-                    self.fail(f'{e=}')
+                with self.subTest(f'in env {env_id} for param config {config}'):
+                    try:
+                        _train_save_load_run(env_id, config)
+                    except Exception as e:
+                        self.fail(f'{e=}')
         try:
             os.remove(model_path)
         except FileNotFoundError:
