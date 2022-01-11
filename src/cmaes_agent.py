@@ -1,5 +1,5 @@
 import pickle
-from typing import Callable, Union
+from typing import Callable, Union, Tuple
 
 import gym
 import numpy as np
@@ -40,7 +40,7 @@ class CMAESAgent:
         print(f'NN: hidden={self.model.hidden}, parameters={self.model.parameters_count()}')
 
     @staticmethod
-    def _extract_env_info(env: gym.Env, action_type: ActionType) -> tuple:
+    def _extract_env_info(env: gym.Env, action_type: ActionType) -> Tuple[int, int]:
         state_size = env.observation_space.shape[0]
         if action_type == ActionType.Continuous:
             actions_size = env.action_space.shape[0]
@@ -53,10 +53,14 @@ class CMAESAgent:
         state_size, actions_size = CMAESAgent._extract_env_info(env, action_type)
         return NN(state_size, actions_size, action_type, max_nn_parameters)
 
-    def learn(self, total_episodes: int = 500, episode_length: int = 1000):
-        def _evaluate_model(_model: NN, env: gym.Env) -> int:
-            end_reward = 0
+    def learn(self, total_timesteps: int = 500_000, log_interval: int = 100):
+        # assuming environments have episode limit of <= 1000
+        episode_length = 1000
+
+        def _evaluate_model(_model: NN, env: gym.Env) -> Tuple[int, int]:
             state = env.reset()
+            end_reward = 0
+            time = 0
             for time in range(episode_length):
                 action = _model.map_to_action(state)
                 if self.action_type == ActionType.Continuous:
@@ -66,25 +70,36 @@ class CMAESAgent:
                     end_reward += reward
                 else:
                     break
-            return end_reward
+            return end_reward, time
 
+        num_timesteps = 0
         model = self.create_nn()
-
         best_offspring = None
-        for e in range(total_episodes):
+        iteration = 0
+
+        while num_timesteps < total_timesteps:
+            iteration += 1
             solutions = []
-            rewards = []
+            timesteps_list = []
+
             for _ in range(self.optimizer.population_size):
                 w = self.optimizer.ask()
                 model.set_weights(w)
-                reward_obtained = _evaluate_model(model, self.env)
-                rewards.append(reward_obtained)
+                reward_obtained, timesteps_used = _evaluate_model(model, self.env)
+                timesteps_list.append(timesteps_used)
                 solutions.append((w, -reward_obtained))
+
             self.optimizer.tell(solutions)
-            best_offspring = max(solutions, key=lambda s: -s[1])
-            if self.verbose:
+            best_offspring_idx = np.argmax([-r[1] for r in solutions])
+            best_offspring = solutions[best_offspring_idx]
+            num_timesteps += timesteps_list[best_offspring_idx]
+
+            if self.verbose and iteration % log_interval == 0:
                 best_reward = -best_offspring[1]
-                print(f'{e=} {best_reward=} avg_reward={sum(rewards) / len(rewards)}')
+                rewards_sum = sum(-r[1] for r in solutions)
+                print(f'{iteration=} {best_reward=} avg_reward={rewards_sum / len(solutions)}')
+                print(f'Timesteps left: {total_timesteps - num_timesteps}')
+
         self.model.set_weights(best_offspring[0])
 
     def predict(self, observation: np.ndarray) -> Union[int, list]:
