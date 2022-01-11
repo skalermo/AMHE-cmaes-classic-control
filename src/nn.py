@@ -6,7 +6,7 @@ import torch
 from torch import nn
 import torch.nn.functional as F
 
-from env_info import ActionType
+from src.env_info import ActionType
 
 
 class NN(nn.Module):

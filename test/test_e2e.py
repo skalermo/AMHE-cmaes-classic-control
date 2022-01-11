@@ -4,7 +4,7 @@ import os
 import gym
 
 from src.cmaes_agent import CMAESAgent
-from env_info import env_to_action_type
+from src.env_info import env_to_action_type
 
 
 class E2E(unittest.TestCase):

@@ -6,7 +6,7 @@ import numpy as np
 from cmaes import CMA
 
 from src.nn import NN
-from env_info import ActionType, env_to_action_type
+from src.env_info import ActionType, env_to_action_type
 
 
 class CMAESAgent:
