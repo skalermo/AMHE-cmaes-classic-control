@@ -72,16 +72,16 @@ class TestNN(unittest.TestCase):
 
     def test_param_count_not_exceed_max(self):
         model = NN(2, 3, max_nn_parameters=50)
-        self.assertTrue(model.parameters_count() <= 50)  # 9
+        self.assertTrue(0 < model.parameters_count() <= 50)  # 9
 
         model = NN(2, 3, max_nn_parameters=100)
-        self.assertTrue(model.parameters_count() <= 100)  # 51
+        self.assertTrue(50 < model.parameters_count() <= 100)  # 51
 
         model = NN(2, 3, max_nn_parameters=150)
-        self.assertTrue(model.parameters_count() <= 150)  # 123
+        self.assertTrue(100 < model.parameters_count() <= 150)  # 123
 
         model = NN(2, 3, max_nn_parameters=200)
-        self.assertTrue(model.parameters_count() <= 200)  # 195
+        self.assertTrue(150 < model.parameters_count() <= 200)  # 195
 
 
 if __name__ == '__main__':
