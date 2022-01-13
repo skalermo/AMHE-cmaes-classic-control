@@ -3,14 +3,14 @@ import os
 
 import gym
 
-from src.cmaes_agent import CMAESAgent
+from src.cmaes_nn import CMAESNN
 from src.env_info import env_to_action_type
 
 
 class E2E(unittest.TestCase):
     def test_runs_ok_in_every_env(self):
         def _run_in_env(env_id):
-            model = CMAESAgent(env_id, cmaes_population_size=5, max_nn_params='minimal')
+            model = CMAESNN(env_id, max_nn_params='minimal')
             model.learn(total_timesteps=1)
             env = gym.make(env_id)
             obs = env.reset()
@@ -26,7 +26,7 @@ class E2E(unittest.TestCase):
 
     def test_reaches_end_of_env(self):
         env_id = 'CartPole-v0'
-        model = CMAESAgent(env_id, cmaes_population_size=5, max_nn_params='minimal')
+        model = CMAESNN(env_id, max_nn_params='minimal')
         model.learn(total_timesteps=1)
         env = gym.make(env_id)
         obs = env.reset()
@@ -44,11 +44,11 @@ class E2E(unittest.TestCase):
         params_configs = ['minimal', 'standard', 100]
 
         def _train_save_load_run(_env_id, _config):
-            model = CMAESAgent(_env_id, cmaes_population_size=5, max_nn_params=_config)
+            model = CMAESNN(_env_id, max_nn_params=_config)
             model.learn(total_timesteps=1)
             model.save(model_path)
             del model
-            model = CMAESAgent.load(model_path)
+            model = CMAESNN.load(model_path)
             env = gym.make(_env_id)
             obs = env.reset()
             action = model.predict(obs)

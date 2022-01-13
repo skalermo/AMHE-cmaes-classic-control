@@ -9,7 +9,7 @@ from src.nn import NN
 from src.env_info import ActionType, env_to_action_type
 
 
-class CMAESAgent:
+class CMAESNN:
     def __init__(self, env_id: str, max_nn_params: Union[str, int] = 'standard',
                  cmaes_sigma: float = 1.3, seed: int = 0,
                  model: NN = None, verbose=False):
@@ -50,7 +50,7 @@ class CMAESAgent:
 
     @staticmethod
     def _create_nn(env: gym.Env, action_type: ActionType, max_nn_parameters: Union[str, int]) -> NN:
-        state_size, actions_size = CMAESAgent._extract_env_info(env, action_type)
+        state_size, actions_size = CMAESNN._extract_env_info(env, action_type)
         return NN(state_size, actions_size, action_type, max_nn_parameters)
 
     def learn(self, total_timesteps: int = 500_000, log_interval: int = 100):
@@ -75,35 +75,35 @@ class CMAESAgent:
         model = self.create_nn()
         best_offspring = None
         best_avg_return = -np.inf
-        iteration = 0
+        episode = 0
 
         while num_timesteps < total_timesteps:
-            iteration += 1
+            episode += 1
             solutions = []
             timesteps_list = []
-            offsprings_returns = []
+            population_returns = []
 
             for _ in range(self.optimizer.population_size):
                 w = self.optimizer.ask()
                 model.set_weights(w)
                 return_obtained, timesteps_used = _evaluate_model(model, self.env)
                 solutions.append((w, -return_obtained))
-                offsprings_returns.append(return_obtained)
+                population_returns.append(return_obtained)
                 timesteps_list.append(timesteps_used)
 
             self.optimizer.tell(solutions)
-            best_offspring_idx = np.argmax([-r[1] for r in solutions])
-            best_offspring_in_episode = solutions[best_offspring_idx]
-            num_timesteps += timesteps_list[best_offspring_idx]
+            best_offspring_idx_in_episode = np.argmax([-r[1] for r in solutions])
+            best_offspring_in_episode = solutions[best_offspring_idx_in_episode]
+            num_timesteps += timesteps_list[best_offspring_idx_in_episode]
 
-            avg_return = np.average(offsprings_returns)
-            if avg_return > best_avg_return:
+            population_avg_return = np.average(population_returns)
+            if population_avg_return > best_avg_return:
                 best_offspring = best_offspring_in_episode
 
-            if self.verbose and iteration % log_interval == 0:
-                best_return = offsprings_returns[best_offspring_idx]
-                std_return = np.std(offsprings_returns)
-                print(f'{iteration=} {best_return=} {avg_return=}, {std_return=}')
+            if self.verbose and episode % log_interval == 0:
+                population_best_return = population_returns[best_offspring_idx_in_episode]
+                population_return_std = np.std(population_returns)
+                print(f'{episode=} {population_best_return=} {population_avg_return=}, {population_return_std=}')
                 print(f'Timesteps used: {num_timesteps}/{total_timesteps} ({round(num_timesteps / total_timesteps * 100, 2)}%)')
 
         self.model.set_weights(best_offspring[0])
