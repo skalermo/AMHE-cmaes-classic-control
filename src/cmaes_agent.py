@@ -81,29 +81,29 @@ class CMAESAgent:
             iteration += 1
             solutions = []
             timesteps_list = []
-            offsprings_returns = []
+            population_returns = []
 
             for _ in range(self.optimizer.population_size):
                 w = self.optimizer.ask()
                 model.set_weights(w)
                 return_obtained, timesteps_used = _evaluate_model(model, self.env)
                 solutions.append((w, -return_obtained))
-                offsprings_returns.append(return_obtained)
+                population_returns.append(return_obtained)
                 timesteps_list.append(timesteps_used)
 
             self.optimizer.tell(solutions)
-            best_offspring_idx = np.argmax([-r[1] for r in solutions])
-            best_offspring_in_episode = solutions[best_offspring_idx]
-            num_timesteps += timesteps_list[best_offspring_idx]
+            best_offspring_idx_in_episode = np.argmax([-r[1] for r in solutions])
+            best_offspring_in_episode = solutions[best_offspring_idx_in_episode]
+            num_timesteps += timesteps_list[best_offspring_idx_in_episode]
 
-            avg_return = np.average(offsprings_returns)
-            if avg_return > best_avg_return:
+            population_avg_return = np.average(population_returns)
+            if population_avg_return > best_avg_return:
                 best_offspring = best_offspring_in_episode
 
             if self.verbose and iteration % log_interval == 0:
-                best_return = offsprings_returns[best_offspring_idx]
-                std_return = np.std(offsprings_returns)
-                print(f'{iteration=} {best_return=} {avg_return=}, {std_return=}')
+                population_best_return = population_returns[best_offspring_idx_in_episode]
+                population_return_std = np.std(population_returns)
+                print(f'{iteration=} {population_best_return=} {population_avg_return=}, {population_return_std=}')
                 print(f'Timesteps used: {num_timesteps}/{total_timesteps} ({round(num_timesteps / total_timesteps * 100, 2)}%)')
 
         self.model.set_weights(best_offspring[0])
