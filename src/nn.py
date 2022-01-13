@@ -10,17 +10,21 @@ from src.env_info import ActionType
 
 
 class NN(nn.Module):
+    HIDDEN_NEURONS = 8
+
     def __init__(self, inputs: int, outputs: int = 1, action_type: ActionType = ActionType.Discrete,
                  max_nn_parameters: Union[str, int] = 'standard'):
         super().__init__()
 
         self.action_type = action_type
-        self.model = self._build_model(inputs, outputs, max_nn_parameters)
-        self.hidden = len(list(self.model.modules())) // 2
+        self.hidden = self._get_hidden_layers_count(inputs, outputs, max_nn_parameters)
+        self.model = self._build_model(inputs, outputs, self.hidden)
         self._disable_grad()
 
     @staticmethod
-    def _calculate_hidden_layers_count(inputs: int, outputs: int, max_nn_parameters: int, hidden_neurons: int):
+    def _calculate_hidden_layers_count(inputs: int, outputs: int, max_nn_parameters: int) -> int:
+        # hidden_neurons = min(2 * (inputs + outputs), 8)
+        hidden_neurons = NN.HIDDEN_NEURONS
         hidden_parameters = max(max_nn_parameters - (inputs + 1) * hidden_neurons - (hidden_neurons + 1) * outputs, 0)
         if hidden_parameters == 0:
             hidden = 0
@@ -29,24 +33,26 @@ class NN(nn.Module):
         return hidden
 
     @staticmethod
-    def _build_model(inputs: int, outputs: int, max_nn_parameters: Union[str, int]) -> nn.Sequential:
-        hidden_neurons = min(2 * (inputs + outputs), 8)
+    def _get_hidden_layers_count(inputs: int, outputs: int, max_nn_parameters: Union[str, int]) -> int:
         if max_nn_parameters == 'standard':
             hidden_layers_count = 1
         elif max_nn_parameters == 'minimal':
             hidden_layers_count = 0
         elif isinstance(max_nn_parameters, int):
-            hidden_layers_count = NN._calculate_hidden_layers_count(inputs, outputs, max_nn_parameters, hidden_neurons)
+            hidden_layers_count = NN._calculate_hidden_layers_count(inputs, outputs, max_nn_parameters)
         else:
-            raise f'Invalid {max_nn_parameters=}'
+            raise ValueError('Invalid {max_nn_parameters=}')
+        return hidden_layers_count
 
+    @staticmethod
+    def _build_model(inputs: int, outputs: int, hidden: int) -> nn.Sequential:
         layers = []
         _inputs = inputs
-        for i in range(hidden_layers_count):
-            _outputs = hidden_neurons
+        for i in range(hidden):
+            _outputs = NN.HIDDEN_NEURONS
             layers.append(nn.Linear(_inputs, _outputs, bias=True))
             layers.append(nn.ReLU())
-            _inputs = hidden_neurons
+            _inputs = NN.HIDDEN_NEURONS
         _outputs = outputs
         layers.append(nn.Linear(_inputs, _outputs, bias=True))
         return nn.Sequential(*layers)
