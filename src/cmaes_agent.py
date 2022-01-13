@@ -60,7 +60,6 @@ class CMAESAgent:
         def _evaluate_model(_model: NN, env: gym.Env) -> Tuple[int, int]:
             state = env.reset()
             cur_return = 0
-            returns = []
             time = 0
             for time in range(episode_length):
                 action = _model.map_to_action(state)
@@ -68,7 +67,6 @@ class CMAESAgent:
                     action = [action]
                 state, reward, done, info = env.step(action)
                 cur_return += reward
-                returns.append(cur_return)
                 if done:
                     break
             return cur_return, time
@@ -76,30 +74,37 @@ class CMAESAgent:
         num_timesteps = 0
         model = self.create_nn()
         best_offspring = None
+        best_avg_return = -np.inf
         iteration = 0
 
         while num_timesteps < total_timesteps:
             iteration += 1
             solutions = []
             timesteps_list = []
+            offsprings_returns = []
 
             for _ in range(self.optimizer.population_size):
                 w = self.optimizer.ask()
                 model.set_weights(w)
                 return_obtained, timesteps_used = _evaluate_model(model, self.env)
-                timesteps_list.append(timesteps_used)
                 solutions.append((w, -return_obtained))
+                offsprings_returns.append(return_obtained)
+                timesteps_list.append(timesteps_used)
 
             self.optimizer.tell(solutions)
             best_offspring_idx = np.argmax([-r[1] for r in solutions])
-            best_offspring = solutions[best_offspring_idx]
+            best_offspring_in_episode = solutions[best_offspring_idx]
             num_timesteps += timesteps_list[best_offspring_idx]
 
+            avg_return = np.average(offsprings_returns)
+            if avg_return > best_avg_return:
+                best_offspring = best_offspring_in_episode
+
             if self.verbose and iteration % log_interval == 0:
-                best_return = -best_offspring[1]
-                returns_sum = sum(-r[1] for r in solutions)
-                print(f'{iteration=} {best_return=} avg_return={returns_sum / len(solutions)}')
-                print(f'Timesteps left: {total_timesteps - num_timesteps}')
+                best_return = offsprings_returns[best_offspring_idx]
+                std_return = np.std(offsprings_returns)
+                print(f'{iteration=} {best_return=} {avg_return=}, {std_return=}')
+                print(f'Timesteps used: {num_timesteps}/{total_timesteps} ({round(num_timesteps / total_timesteps * 100, 2)}%)')
 
         self.model.set_weights(best_offspring[0])
 
