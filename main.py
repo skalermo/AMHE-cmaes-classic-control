@@ -8,7 +8,7 @@ def main():
     model_name = '_'.join([CMAESAgent.__name__, env_id])
     cmaes_agent = CMAESAgent.load(model_name)
     if cmaes_agent is None:
-        cmaes_agent = CMAESAgent(env_id, cmaes_population_size=10, max_nn_params=100, verbose=True)
+        cmaes_agent = CMAESAgent(env_id, max_nn_params='standard', verbose=True)
         cmaes_agent.learn(total_timesteps=123_456)
         cmaes_agent.save(model_name)
 

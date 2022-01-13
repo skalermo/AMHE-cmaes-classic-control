@@ -10,8 +10,8 @@ from src.env_info import ActionType, env_to_action_type
 
 
 class CMAESAgent:
-    def __init__(self, env_id: str, max_nn_params: Union[str, int] = 'standard', seed: int = 0,
-                 cmaes_sigma: float = 1.3, cmaes_population_size: int = 30,
+    def __init__(self, env_id: str, max_nn_params: Union[str, int] = 'standard',
+                 cmaes_sigma: float = 1.3, seed: int = 0,
                  model: NN = None, verbose=False):
         self.env_id = env_id
         self.verbose = verbose
@@ -29,7 +29,7 @@ class CMAESAgent:
             self.model = self.create_nn()
         self.optimizer = CMA(
             mean=np.zeros(self.model.parameters_count()),
-            sigma=cmaes_sigma, population_size=cmaes_population_size, seed=self.seed
+            sigma=cmaes_sigma, seed=self.seed,
         )
         if verbose:
             self.info()
