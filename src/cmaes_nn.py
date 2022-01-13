@@ -9,7 +9,7 @@ from src.nn import NN
 from src.env_info import ActionType, env_to_action_type
 
 
-class CMAESAgent:
+class CMAESNN:
     def __init__(self, env_id: str, max_nn_params: Union[str, int] = 'standard',
                  cmaes_sigma: float = 1.3, seed: int = 0,
                  model: NN = None, verbose=False):
@@ -50,7 +50,7 @@ class CMAESAgent:
 
     @staticmethod
     def _create_nn(env: gym.Env, action_type: ActionType, max_nn_parameters: Union[str, int]) -> NN:
-        state_size, actions_size = CMAESAgent._extract_env_info(env, action_type)
+        state_size, actions_size = CMAESNN._extract_env_info(env, action_type)
         return NN(state_size, actions_size, action_type, max_nn_parameters)
 
     def learn(self, total_timesteps: int = 500_000, log_interval: int = 100):
