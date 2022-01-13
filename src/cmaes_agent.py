@@ -75,10 +75,10 @@ class CMAESAgent:
         model = self.create_nn()
         best_offspring = None
         best_avg_return = -np.inf
-        iteration = 0
+        episode = 0
 
         while num_timesteps < total_timesteps:
-            iteration += 1
+            episode += 1
             solutions = []
             timesteps_list = []
             population_returns = []
@@ -100,10 +100,10 @@ class CMAESAgent:
             if population_avg_return > best_avg_return:
                 best_offspring = best_offspring_in_episode
 
-            if self.verbose and iteration % log_interval == 0:
+            if self.verbose and episode % log_interval == 0:
                 population_best_return = population_returns[best_offspring_idx_in_episode]
                 population_return_std = np.std(population_returns)
-                print(f'{iteration=} {population_best_return=} {population_avg_return=}, {population_return_std=}')
+                print(f'{episode=} {population_best_return=} {population_avg_return=}, {population_return_std=}')
                 print(f'Timesteps used: {num_timesteps}/{total_timesteps} ({round(num_timesteps / total_timesteps * 100, 2)}%)')
 
         self.model.set_weights(best_offspring[0])
