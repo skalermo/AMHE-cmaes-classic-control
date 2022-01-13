@@ -30,7 +30,8 @@ class NN(nn.Module):
 
     @staticmethod
     def _build_model(inputs: int, outputs: int, max_nn_parameters: Union[str, int]) -> nn.Sequential:
-        hidden_neurons = min(2 * (inputs + outputs), 8)
+        # hidden_neurons = min(2 * (inputs + outputs), 8)
+        hidden_neurons = 8
         if max_nn_parameters == 'standard':
             hidden_layers_count = 1
         elif max_nn_parameters == 'minimal':
