@@ -1,5 +1,5 @@
 import pickle
-from typing import Callable, Union, Tuple
+from typing import Callable, Union, Tuple, Optional
 
 import gym
 import numpy as np
@@ -11,7 +11,7 @@ from src.env_info import ActionType, env_to_action_type
 
 class CMAESNN:
     def __init__(self, env_id: str, max_nn_params: Union[str, int] = 'standard',
-                 cmaes_sigma: float = 1.3, seed: int = 0,
+                 cmaes_sigma: float = 1.3, seed: int = 0, pop_size: Optional[int] = None,
                  model: NN = None, verbose=False):
         self.env_id = env_id
         self.verbose = verbose
@@ -30,6 +30,7 @@ class CMAESNN:
         self.optimizer = CMA(
             mean=np.zeros(self.model.parameters_count()),
             sigma=cmaes_sigma, seed=self.seed,
+            population_size=pop_size,
         )
         if verbose:
             self.info()
