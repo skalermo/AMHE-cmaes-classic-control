@@ -7,7 +7,7 @@ from src.cmaes_nn import CMAESNN
 from src.env_info import env_to_action_type
 
 
-class E2E(unittest.TestCase):
+class TestCmaesNN(unittest.TestCase):
     def test_runs_ok_in_every_env(self):
         def _run_in_env(env_id):
             model = CMAESNN(env_id, max_nn_params='minimal', pop_size=5)
