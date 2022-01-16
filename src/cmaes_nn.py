@@ -1,5 +1,5 @@
 import pickle
-from typing import Callable, Union, Tuple
+from typing import Callable, Union, Tuple, Optional
 
 import gym
 import numpy as np
@@ -11,7 +11,7 @@ from src.env_info import ActionType, env_to_action_type
 
 class CMAESNN:
     def __init__(self, env_id: str, max_nn_params: Union[str, int] = 'standard',
-                 cmaes_sigma: float = 1.3, seed: int = 0,
+                 cmaes_sigma: float = 1.3, seed: int = 0, pop_size: Optional[int] = None,
                  model: NN = None, verbose=False):
         self.env_id = env_id
         self.verbose = verbose
@@ -30,6 +30,7 @@ class CMAESNN:
         self.optimizer = CMA(
             mean=np.zeros(self.model.parameters_count()),
             sigma=cmaes_sigma, seed=self.seed,
+            population_size=pop_size,
         )
         if verbose:
             self.info()
@@ -54,6 +55,8 @@ class CMAESNN:
         return NN(state_size, actions_size, action_type, max_nn_parameters)
 
     def learn(self, total_timesteps: int = 500_000, log_interval: int = 100):
+        if self.verbose:
+            print('Start learning')
         # assuming environments have episode limit of <= 1000
         episode_length = 1000
 
@@ -103,8 +106,7 @@ class CMAESNN:
             if self.verbose and episode % log_interval == 0:
                 population_best_return = population_returns[best_offspring_idx_in_episode]
                 population_return_std = np.std(population_returns)
-                print(f'{episode=} {population_best_return=} {population_avg_return=}, {population_return_std=}')
-                print(f'Timesteps used: {num_timesteps}/{total_timesteps} ({round(num_timesteps / total_timesteps * 100, 2)}%)')
+                print(f'{episode=} {population_best_return=} {population_avg_return=} {population_return_std=} total_timesteps={num_timesteps}')
 
         self.model.set_weights(best_offspring[0])
 

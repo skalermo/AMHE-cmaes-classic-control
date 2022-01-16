@@ -1,0 +1,16 @@
+CartPole-v0 (4, 2)
+NN(
+  (model): Sequential(
+    (0): Linear(in_features=4, out_features=8, bias=True)
+    (1): ReLU()
+    (2): Linear(in_features=8, out_features=2, bias=True)
+  )
+)
+NN: hidden=1, parameters=58
+Start learning
+episode=1 population_best_return=9.0 population_avg_return=11.375 population_return_std=2.6896793489187516 total_timesteps=8
+episode=2 population_best_return=11.0 population_avg_return=21.125 population_return_std=21.496729402399797 total_timesteps=18
+episode=3 population_best_return=15.0 population_avg_return=17.125 population_return_std=16.189792308735772 total_timesteps=32
+episode=4 population_best_return=22.0 population_avg_return=17.6875 population_return_std=12.215352788601727 total_timesteps=53
+episode=5 population_best_return=47.0 population_avg_return=33.9375 population_return_std=32.888958538542994 total_timesteps=99
+episode=6 population_best_return=27.0 population_avg_return=29.1875 population_return_std=45.2344154792565 total_timesteps=125
