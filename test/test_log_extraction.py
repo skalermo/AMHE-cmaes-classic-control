@@ -4,9 +4,8 @@ import gym
 from stable_baselines3 import A2C, PPO
 
 from src.env_info import env_to_action_type
-from src.log_utils import process_logs, process_cmaess_nn_logs
+from src.log_utils import process_logs, process_cmaess_nn_logs, captured_output
 from src.cmaes_nn import CMAESNN
-from utils import captured_output
 
 
 class TestLearningLogExtraction(unittest.TestCase):

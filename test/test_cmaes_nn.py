@@ -14,7 +14,7 @@ class TestCmaesNN(unittest.TestCase):
             model.learn(total_timesteps=1)
             env = gym.make(env_id)
             obs = env.reset()
-            action = model.predict(obs)
+            action, _ = model.predict(obs)
             env.step(action)
 
         for env_id in env_to_action_type.keys():
@@ -33,7 +33,7 @@ class TestCmaesNN(unittest.TestCase):
         done = False
         i = 0
         for i in range(100):
-            action = model.predict(obs)
+            action, _ = model.predict(obs)
             obs, rewards, done, info = env.step(action)
             if done:
                 break
@@ -51,7 +51,7 @@ class TestCmaesNN(unittest.TestCase):
             model = CMAESNN.load(model_path)
             env = gym.make(_env_id)
             obs = env.reset()
-            action = model.predict(obs)
+            action, _ = model.predict(obs)
             env.step(action)
 
         for env_id in env_to_action_type.keys():
