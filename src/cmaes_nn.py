@@ -110,11 +110,11 @@ class CMAESNN:
 
         self.model.set_weights(best_offspring[0])
 
-    def predict(self, observation: np.ndarray) -> Union[int, list]:
+    def predict(self, observation: np.ndarray) -> [Union[int, list], None]:
         action = self.model.map_to_action(observation)
         if self.action_type == ActionType.Continuous:
             action = [action]
-        return action
+        return action, None
 
     def save(self, path):
         self.create_nn = None
