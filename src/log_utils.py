@@ -1,4 +1,7 @@
-def chunk_rollouts(logs: str):
+from typing import Generator
+
+
+def chunk_rollouts(logs: str) -> Generator[str, None, None]:
     while (start := logs.find("rollout")) != -1:
         end = logs.find("rollout", start + 1)
         if end == -1:
