@@ -38,8 +38,8 @@ def _test_loop(model: MODEL_TYPE, env_id: str) -> int:
 
 
 def main():
-    # total_timesteps = 500_000
-    total_timesteps = 1000
+    total_timesteps = 500_000
+
     env_ids = env_to_action_type.keys()
     models = {
         'CMAESNN': lambda env_id, verbose: CMAESNN(env_id, verbose=verbose),
@@ -55,6 +55,7 @@ def main():
     models_dir = f'{data_dir}/models'
     _create_dirs(logs_dir, models_dir)
 
+    # skips if already trained
     for env_id in env_ids:
         for model_name, model_fn in models.items():
             for run in range(train_runs):
