@@ -58,26 +58,29 @@ def main():
     for env_id in env_ids:
         for model_name, model_fn in models.items():
             for run in range(train_runs):
-                model_path = f'{models_dir}/{model_name}_{env_id}_{run}.zip'
+                model_path = f'{models_dir}/{env_id}_{model_name}_{run}.zip'
                 print(f'Training {model_name} on {env_id} run {run}')
                 if os.path.exists(model_path):
                     print(f'Model {model_path} already exists, skipping')
                     continue
 
-                model = model_fn(env_id, verbose=1)
                 with captured_output() as (out, _):
+                    model = model_fn(env_id, verbose=1)
                     model.learn(total_timesteps=total_timesteps)
 
-                with open(f'{logs_dir}/{model_name}_{env_id}_{run}.log', 'w') as f:
+                with open(f'{logs_dir}/{env_id}_{model_name}_{run}.log', 'w') as f:
                     f.write(out.getvalue())
                 model.save(model_path)
 
     for env_id in env_ids:
         for model_name, _ in models.items():
+            returns = []
             for run in range(test_runs):
-                model_path = f'{models_dir}/{model_name}_{env_id}_0.zip'
+                model_path = f'{models_dir}/{env_id}_{model_name}_0.zip'
                 model = _str_to_class(model_name).load(model_path)
                 return_ = _test_loop(model, env_id)
+                returns.append(return_)
+            print(f'{model_name} on {env_id} returns (on avg): {sum(returns) / test_runs}')
 
 
 if __name__ == '__main__':
