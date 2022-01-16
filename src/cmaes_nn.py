@@ -55,6 +55,8 @@ class CMAESNN:
         return NN(state_size, actions_size, action_type, max_nn_parameters)
 
     def learn(self, total_timesteps: int = 500_000, log_interval: int = 100):
+        if self.verbose:
+            print('Start learning')
         # assuming environments have episode limit of <= 1000
         episode_length = 1000
 
@@ -104,8 +106,7 @@ class CMAESNN:
             if self.verbose and episode % log_interval == 0:
                 population_best_return = population_returns[best_offspring_idx_in_episode]
                 population_return_std = np.std(population_returns)
-                print(f'{episode=} {population_best_return=} {population_avg_return=}, {population_return_std=}')
-                print(f'Timesteps used: {num_timesteps}/{total_timesteps} ({round(num_timesteps / total_timesteps * 100, 2)}%)')
+                print(f'{episode=} {population_best_return=} {population_avg_return=} {population_return_std=} total_timesteps={num_timesteps}')
 
         self.model.set_weights(best_offspring[0])
 
