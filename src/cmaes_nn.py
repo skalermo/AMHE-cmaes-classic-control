@@ -54,7 +54,7 @@ class CMAESNN:
         state_size, actions_size = CMAESNN._extract_env_info(env, action_type)
         return NN(state_size, actions_size, action_type, max_nn_parameters)
 
-    def learn(self, total_timesteps: int = 500_000, log_interval: int = 100):
+    def learn(self, total_timesteps: int = 500_000, log_interval: int = 1):
         if self.verbose:
             print('Start learning')
         # assuming environments have episode limit of <= 1000
