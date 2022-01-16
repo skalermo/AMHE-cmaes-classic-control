@@ -39,3 +39,18 @@ def process_logs(logs: str) -> list:
     for chunk in chunk_rollouts(logs):
         data.append(extract_data(chunk))
     return data
+
+
+def process_cmaess_nn_logs(logs: str) -> list:
+    data = []
+    start_idx = logs.find('Start learning')
+    lines = logs[start_idx:].split('\n')[1:]
+    for line in lines:
+        # episode = 1 population_best_return = 9.0 population_avg_return = 11.375 population_return_std = 2.6896793489187516 total_timesteps = 8
+        _data = {'episode': None, 'population_best_return': None, 'population_avg_return': None, 'population_return_std': None, 'total_timesteps': None}
+        words = line.split()
+        for word in words:
+            k, v = word.split('=')
+            _data[k] = float(v)
+        data.append(_data)
+    return data
