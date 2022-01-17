@@ -2,4 +2,11 @@
 .data/
 venv/
 __pycache__/
-docs/amhe_doc.pdf
+docs/amhe_docs.pdf
+
+*.aux
+*.fdb_latexmk
+*.fls
+*.out
+*.log
+*.synctex.gz
