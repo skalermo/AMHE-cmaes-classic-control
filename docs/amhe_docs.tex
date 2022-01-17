@@ -19,6 +19,8 @@
 \usepackage{mathtools}
 
 \usepackage{listings}
+% colors for snippet background
+\usepackage{xcolor}
 
 % links
 \usepackage{hyperref}
@@ -36,6 +38,9 @@
 
 \usepackage{multirow} 
 \usepackage{makecell}
+
+% display structure of the project
+\usepackage{dirtree}
 
 \title{Dokumentacja do projektu z AMHE}
 
@@ -100,8 +105,104 @@ algorytmy RL to A2C oraz PPO.
         biblioteka zawierająca gotowe implementację algorytmów RL.
 \end{itemize}
 
+\pagebreak
 \section{Project końcowy}
 
+\subsection{Opis struktury projektu}
+
+Na rysunku \ref{fig:dirtree} pokazana jest struktura projektu.
+
+\begin{figure}[!ht]
+  \dirtree{%
+    .1 ..
+    .2 .gitignore.
+    .2 docs.
+    .3 amhe\_docs.tex.
+    .2 main.py.
+    .2 requirements.txt.
+    .2 src.
+    .3 cmaes\_nn.py.
+    .3 env\_info.py.
+    .3 log\_utils.py.
+    .3 nn.py.
+    .2 test.
+    .3 test\_cmaes\_nn.py.
+    .3 test\_data.
+    .4 example\_log\_a2c.txt.
+    .4 example\_log\_cmaesnn.txt.
+    .3 test\_log\_extraction.py.
+    .3 test\_log\_utils.py.
+    .3 test\_nn.py.
+  }
+  \caption{Struktura plików projektu}
+  \label{fig:dirtree}
+\end{figure}
+
+Plik \textbf{main.py} odpowiada za główny skrypt, który wykonuje uczenie
+modeli oraz zapisanie wyników uczenia: logów oraz wytrenowanych modeli
+do katalogów \textbf{.data/logs} oraz \textbf{.data/models} odpowiednio. \\
+
+Kod źródłowy projektu, z którego jest zbudowany \textbf{main.py} znajduje się
+w katalogu \textbf{src}:
+\begin{itemize}
+  \item \textbf{cmaes\_nn.py} - zawiera implementację algorytmu do rozwiązywania
+        problemów kontroli klasycznej, jego interfejs jest zbliżony
+        do algorytmów RL z pakietu \textbf{stable-baselines3}
+        (tzn. posiada implementacje funkcji \emph{learn()}, \emph{predict()},
+        \emph{load()}, \emph{save()}). \\
+        Łączy w sobie stosowanie algorytmu CMA-ES oraz perceptronu wielowarstwowego.
+
+  \item \textbf{env\_info.py} - zawiera listę nazw środowisk do problemów kontroli
+        klasycznej oraz informacje o tym, czy typ akcji jest ciągły bądź dyskretny.
+
+  \item \textbf{log\_utils.py} - zawiera funkcje pomocnicze do przetwarzania
+        logów programu.
+
+  \item \textbf{nn.py} - zawiera funkcje do zbudowania perceptronu
+        wielowarstwowego, a także funkcje do przypisania wektora parametrów
+        do wag perceptronu.
+\end{itemize}
+
+Wraz z implementacją projektu powstawały testy do sprawdzenia poprawności
+jego działania. Znajdują się w katalogu \textbf{test}. \\
+
+Katalog \textbf{docs} przechowuje dokumentację projektu.
+Plik \textbf{requirements.txt} zawiera listę wymaganych do zainstalowania
+bibliotek.
+
+\subsection{Uruchomienie projektu}
+
+Dla uruchomienia projektu niezbędne jest posiadania interpretera Python wersji co najmniej 3.8
+oraz zainstalowanie bibliotek znajdujących w pliku \textbf{requirements.txt}:
+
+\begin{lstlisting}[
+  backgroundcolor = \color{lightgray},
+  language=bash,
+]
+  $ pip install -r requirements.txt
+\end{lstlisting}
+
+\bigskip
+
+Następnie można uruchomić główny skrypt za pomocą polecenia:
+
+\begin{lstlisting}[
+  backgroundcolor = \color{lightgray},
+  language=bash,
+]
+  $ python main.py
+\end{lstlisting}
+
+Testy można uruchomić poleceniem:
+
+\begin{lstlisting}[
+  backgroundcolor = \color{lightgray},
+  language=bash,
+]
+  $ python -m unittest discover test
+\end{lstlisting}
+
+\pagebreak
 \begin{thebibliography}{9}
   \bibitem{scalable_alternative}
   Tim Salimans, Jonathan Ho, Xi Chen, Szymon Sidor, Ilya Sutskever,\\
