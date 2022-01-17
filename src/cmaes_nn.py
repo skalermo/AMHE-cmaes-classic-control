@@ -1,3 +1,4 @@
+import time
 import pickle
 from typing import Callable, Union, Tuple, Optional
 
@@ -13,6 +14,7 @@ class CMAESNN:
     def __init__(self, env_id: str, max_nn_params: Union[str, int] = 'standard',
                  cmaes_sigma: float = 1.3, seed: int = 0, pop_size: Optional[int] = None,
                  model: NN = None, verbose=False):
+        self.start_time = None
         self.env_id = env_id
         self.verbose = verbose
         if env_to_action_type.get(env_id) is not None:
@@ -55,8 +57,11 @@ class CMAESNN:
         return NN(state_size, actions_size, action_type, max_nn_parameters)
 
     def learn(self, total_timesteps: int = 500_000, log_interval: int = 1):
+        self.start_time = time.time()
+
         if self.verbose:
             print('Start learning')
+
         # assuming environments have episode limit of <= 1000
         episode_length = 1000
 
@@ -106,7 +111,9 @@ class CMAESNN:
             if self.verbose and episode % log_interval == 0:
                 population_best_return = population_returns[best_offspring_idx_in_episode]
                 population_return_std = np.std(population_returns)
-                print(f'{episode=} {population_best_return=} {population_avg_return=} {population_return_std=} total_timesteps={num_timesteps}')
+                print(f'{episode=} {population_best_return=} {population_avg_return=}'
+                      f' {population_return_std=} total_timesteps={num_timesteps}'
+                      f' time_elapsed={int(time.time() - self.start_time)}')
 
         self.model.set_weights(best_offspring[0])
 
