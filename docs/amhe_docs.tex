@@ -17,6 +17,9 @@
 
 % for advanced math formulas
 \usepackage{mathtools}
+% define ceil and floor
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
 
 \usepackage{listings}
 % colors for snippet background
@@ -50,6 +53,8 @@
 \begin{document}
 
 \maketitle
+\tableofcontents
+\newpage
 
 \section{Treść zadania}
 
@@ -84,7 +89,7 @@ Do rozwiązania tego problemu planujemy zastosować sieć MLP, gdzie wejściem s
 będzie stan rozważanego środowiska, a wyjściem będzie akcja do wyboru przez agenta.
 Sieć ta będzie optymalizowana za pomocą algorytmu ewolucyjnego CMA-ES.
 
-\subsection{Planowane eksperymenty numeryczne}
+\subsection{Planowane eksperymenty numeryczne}\label{subsection:planned}
 
 W ramach eksperymentów ocenimy działanie implementacji naszego algorytmu
 neuroewolucji na różnych środowiskach OpenAI gym.
@@ -94,7 +99,7 @@ końcowej nagrody oraz czasu uczenia algorytmu. Wybrane przez nas
 algorytmy RL to A2C oraz PPO.
 
 
-\subsection{Biblioteki wybrane do realizacji projektu}
+\subsection{Biblioteki wybrane do realizacji projektu}\label{subsection:libs}
 
 \begin{itemize}
   \item \textbf{\href{https://github.com/openai/gym}{gym}} - liczne środowiska, w tym kontroli klasycznej,
@@ -107,6 +112,96 @@ algorytmy RL to A2C oraz PPO.
 
 \pagebreak
 \section{Project końcowy}
+
+\subsection{Uzupełnienie projektu wstępnego}
+
+Na dodatek do bibliotek wymienionych w \ref{subsection:libs} użyliśmy
+biblioteki \textbf{\href{https://pytorch.org/}{PyTorch}} do implementacji
+perceptronu wielowarstwowego.
+
+\subsection{Przeprowadzone eksperymenty}
+
+Dany rozdział opisuje szczegóły przeprowadzonych w ramach projektu
+eksperymentów: opis środowisk na których działają agenty, ich uczenie oraz
+wnioski.
+
+\subsubsection{Opis środowisk kontroli klasycznej}
+
+Do przetestowania algorytmów rozważanych w ramach projektu wykorzystane
+zostały środowiska OpenAI gym \cite{openai_gym}, w szczególności dotyczące
+kontroli klasycznej: środowiska powszechnie znane, proste ze względu
+na działanie i rozwiązywalność.
+
+W tabeli \ref{table:env_properties} znajdują się rozważane przez nas
+środowiska oraz ich właściwości.
+
+
+% 500 iterations
+\begin{table}[!h]
+  \begin{tabular}{lrrrr}
+    \hline
+    \multicolumn{1}{c}{Środowisko} & \multicolumn{1}{c}{\# obs.} & \multicolumn{1}{c}{\# akcje} & \multicolumn{1}{c}{typ akcji} & \multicolumn{1}{c}{rozwiązanie} \\
+    \hline
+    CartPole-v0                    & 4                           & 2                            & dyskretna                     & 195                             \\
+    CartPole-v1                    & 4                           & 2                            & dyskretna                     & 475                             \\
+    MountainCar-v0                 & 2                           & 3                            & dyskretna                     & -110                            \\
+    MountainCarContinuous-v0       & 2                           & 1                            & ciągła                        & 90                              \\
+    Pendulum-v1                    & 3                           & 1                            & ciągła                        & -140                            \\
+    Acrobot-v1                     & 6                           & 3                            & dyskretna                     & -60                             \\
+    \hline
+  \end{tabular}
+  \caption{
+    Właściwości środowisk kontroli klasycznej. Kolumny "obs." oraz "akcje"
+    wskazują wymiary zbiorów obserwacji oraz akcji odpowiednio w każdym środowisku.
+    Kolumna "rozwiązanie" zawiera wartości, które wskazują granice
+    nagród dla każdego środowiska, powyżej których można uznać, że agent
+    zachowuje się sensownie \cite{analyzing_reinforcement} \cite{openai_gym}.
+  }\label{table:env_properties}
+\end{table}
+
+\subsubsection{Metryki do porównania algorytmów}
+
+Zgodnie z rozdziałem \ref{subsection:planned} porównujemy
+algorytm neuroewolucji - połączenie CMA-ES z siecią MLP z dwoma algorytmami
+RL - A2C oraz PPO.
+
+Zdajemy sobie sprawę, że nie możemy wprost porównywać tych algorytmów, gdyż
+charakter uczenia w nich jest różny: algorytm neuroewolucji uczy się
+przeszukując przestrzeń parametrów sieci MLP, jedyną informacją zwrotną jest
+końcowa suma nagród otrzymana na danym środowisku. Natomiast algorytmy
+RL optymalizują swoją politykę zachowania na środowisku, potrafią
+uwzględniać natychmiastowe nagrody, a także stany i akcje, które do nich
+prowadzą.
+
+Do porównania algorytmów uwzględnimy jak szybko algorytmy osiągają
+kolejne sumy nagród, ile czasu zajęło uczenie. Najważniejszą metryką
+porównania jest uśredniona suma nagród uzyskiwana  przez modele nauczone.
+
+\subsubsection{Opis modeli do nauczenia}
+
+\textbf{Algorytm neuroewolucji}: użyliśmy perceptronu
+dwuwarstwowego z 8 neuronami w warstwie ukrytej. Także perceptron ten
+zawiera dodatkowe parametry (bias). Wybraliśmy ReLU jako funkcję aktywacji.
+Algorytm \mbox{CMA-ES} automatycznie dobiera liczność populacji zgodnie
+ze wzorem:
+
+\begin{equation*}
+  population\_size = 4 + \floor{3 * \ln{(n)} }
+\end{equation*}
+
+gdzie $n$ to wymiar przestrzeni parametrów sieci. Przykładowo
+dla $ n = 100 $ liczność populacji wynosi 17. Parametr $\sigma$
+został wybrany arbitralnie i \mbox{wynosi $1.3$}.
+
+\bigskip
+
+\noindent\textbf{Algorytmy A2C i PPO}: użyliśmy domyślnych konfiguracji
+modeli tych algorytmów z pakietu stable\_baselines3 z polityką
+\emph{MlpPolicy}.
+
+\subsubsection{Uczenie modeli}
+
+\subsubsection{Wnioski}
 
 \subsection{Opis struktury projektu}
 
@@ -202,12 +297,26 @@ Testy można uruchomić poleceniem:
   $ python -m unittest discover test
 \end{lstlisting}
 
+% \appendix
+% \section{Wykresy uczenia modeli}
+
 \pagebreak
 \begin{thebibliography}{9}
   \bibitem{scalable_alternative}
   Tim Salimans, Jonathan Ho, Xi Chen, Szymon Sidor, Ilya Sutskever,\\
   Evolution Strategies as a Scalable Alternative to Reinforcement Learning,
   2017, \href{https://arxiv.org/pdf/1703.03864v1.pdf}{https://arxiv.org/pdf/1703.03864v1.pdf}
+
+  \bibitem{analyzing_reinforcement}
+  Declan Oller, Tobias Glasmachers, Giuseppe Cuccu, \\
+  Analyzing Reinforcement Learning Benchmarks with Random Weight Guessing,
+  2020, \href{https://arxiv.org/pdf/2004.07707.pdf}{https://arxiv.org/pdf/2004.07707.pdf}
+
+  \bibitem{openai_gym}
+  Greg Brockman, Vicki Cheung, Ludwig Pettersson, Jonas Schneider, John Schulman, Jie Tang, Wojciech Zaremba,\\
+  OpenAI Gym, 2016, \href{https://gym.openai.com/}{https://gym.openai.com/} \\
+  rejestr środowisk (zawiera m.i. nagrody graniczne środowisk): \\
+  \href{https://github.com/openai/gym/blob/master/gym/envs/\_\_init\_\_.py}{https://github.com/openai/gym/blob/master/gym/envs/\_\_init\_\_.py}
 
 \end{thebibliography}
 
