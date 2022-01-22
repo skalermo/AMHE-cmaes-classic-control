@@ -5,7 +5,7 @@ from src.log_utils import chunk_rollouts, extract_data, process_logs, process_cm
 
 class MyTestCase(unittest.TestCase):
     def setUp(self) -> None:
-        with open('test_data/example_log_a2c.txt', 'r') as f:
+        with open('./test/test_data/example_log_a2c.txt', 'r') as f:
             self.logs = f.read()
 
     def test_chunk_rollouts(self):
@@ -29,7 +29,7 @@ class MyTestCase(unittest.TestCase):
             self.assertTrue('total_timesteps' in d)
 
     def test_process_cmaes_nn_logs(self):
-        with open('test_data/example_log_cmaesnn.txt', 'r') as f:
+        with open('./test/test_data/example_log_cmaesnn.txt', 'r') as f:
             logs = f.read()
         data = process_cmaess_nn_logs(logs)
         self.assertTrue(isinstance(data, list))
