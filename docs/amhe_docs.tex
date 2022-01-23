@@ -42,6 +42,9 @@
 % display structure of the project
 \usepackage{dirtree}
 
+% include pdf images
+\usepackage{pdfpages}
+
 \title{Dokumentacja do projektu z AMHE}
 
 \author{Roman Moskalenko \and Pavel Tarashkevich}
@@ -210,5 +213,78 @@ Testy można uruchomić poleceniem:
   2017, \href{https://arxiv.org/pdf/1703.03864v1.pdf}{https://arxiv.org/pdf/1703.03864v1.pdf}
 
 \end{thebibliography}
+
+\pagebreak
+\appendix
+\section{Wykresy uczenia algorymów}
+
+\begin{figure}[ht!]
+  \centering
+  \begin{subfigure}[ht!]{0.35\textwidth}
+    \includegraphics[width=\textwidth]{../plotting/plots/plot_all0.pdf}
+    \caption{}
+  \end{subfigure}
+  \hspace{0.05\textwidth}
+  \begin{subfigure}[ht!]{0.35\textwidth}
+    \includegraphics[width=\textwidth]{../plotting/plots/plot_all1.pdf}
+    \caption{}
+  \end{subfigure}
+
+  \begin{subfigure}[ht!]{0.35\textwidth}
+    \includegraphics[width=\textwidth]{../plotting/plots/plot_all2.pdf}
+    \caption{}
+  \end{subfigure}
+  \hspace{0.05\textwidth}
+  \begin{subfigure}[ht!]{0.35\textwidth}
+    \includegraphics[width=\textwidth]{../plotting/plots/plot_all3.pdf}
+    \caption{}
+  \end{subfigure}
+
+  \begin{subfigure}[ht!]{0.35\textwidth}
+    \includegraphics[width=\textwidth]{../plotting/plots/plot_all4.pdf}
+    \caption{}
+  \end{subfigure}
+  \caption{Pięć niezależnych przebiegów uczenia algorytmów w przeciągu 500,000 kroków.
+    Algorytmom tym odpowiadają kolory: CMAESNN - fioletowy, PPO - niebieski,
+    A2C - czerwony.}
+  \label{}
+
+\end{figure}
+
+\pagebreak
+\section{Wpływ bias'u na uczenie CMAESNN}
+
+\begin{figure}[ht!]
+  \centering
+  \begin{subfigure}[ht!]{0.35\textwidth}
+    \includegraphics[width=\textwidth]{../plotting/plots/plot_bias_perf0.pdf}
+    \caption{}
+  \end{subfigure}
+  \hspace{0.05\textwidth}
+  \begin{subfigure}[ht!]{0.35\textwidth}
+    \includegraphics[width=\textwidth]{../plotting/plots/plot_bias_perf1.pdf}
+    \caption{}
+  \end{subfigure}
+
+  \begin{subfigure}[ht!]{0.35\textwidth}
+    \includegraphics[width=\textwidth]{../plotting/plots/plot_bias_perf2.pdf}
+    \caption{}
+  \end{subfigure}
+  \hspace{0.05\textwidth}
+  \begin{subfigure}[ht!]{0.35\textwidth}
+    \includegraphics[width=\textwidth]{../plotting/plots/plot_bias_perf3.pdf}
+    \caption{}
+  \end{subfigure}
+
+  \begin{subfigure}[ht!]{0.35\textwidth}
+    \includegraphics[width=\textwidth]{../plotting/plots/plot_bias_perf4.pdf}
+    \caption{}
+  \end{subfigure}
+  \caption{Pięć niezależnych przebiegów uczenia algorytmów CMAESNN
+    z (niebieski) i bez (czerwony) dodatkowymi parametrami bias.
+    Uczenie dokonywało się w przeciągu 500,000 kroków.}
+  \label{}
+
+\end{figure}
 
 \end{document}
