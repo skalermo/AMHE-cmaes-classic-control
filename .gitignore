@@ -10,3 +10,4 @@ docs/amhe_docs.pdf
 *.out
 *.log
 *.synctex.gz
+*.toc
