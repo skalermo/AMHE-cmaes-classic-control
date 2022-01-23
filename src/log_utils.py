@@ -63,6 +63,8 @@ def process_cmaess_nn_logs(logs: str) -> list:
     start_idx = logs.find('Start learning')
     lines = logs[start_idx:].split('\n')[1:]
     for line in lines:
+        if not line:
+            continue
         # episode = 1 population_best_return = 9.0 population_avg_return = 11.375 population_return_std = 2.6896793489187516 total_timesteps = 8
         _data = {'episode': None, 'population_best_return': None, 'population_avg_return': None, 'population_return_std': None, 'total_timesteps': None}
         words = line.split()
