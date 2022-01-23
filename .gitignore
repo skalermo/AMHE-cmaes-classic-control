@@ -1,5 +1,5 @@
 .idea/
-.data/
+.data*
 venv/
 __pycache__/
 docs/amhe_docs.pdf
