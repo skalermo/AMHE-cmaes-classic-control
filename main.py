@@ -4,6 +4,7 @@ from typing import Type, Union
 
 import gym
 from stable_baselines3 import A2C, PPO
+import numpy as np
 
 from src.cmaes_nn import CMAESNN
 from src.env_info import env_to_action_type
@@ -76,12 +77,13 @@ def main():
     for env_id in env_ids:
         for model_name, _ in models.items():
             returns = []
-            for run in range(test_runs):
-                model_path = f'{models_dir}/{env_id}_{model_name}_0.zip'
+            for run in range(train_runs):
+                model_path = f'{models_dir}/{env_id}_{model_name}_{run}.zip'
                 model = _str_to_class(model_name).load(model_path)
-                return_ = _test_loop(model, env_id)
-                returns.append(return_)
-            print(f'{model_name} on {env_id} returns (on avg): {sum(returns) / test_runs}')
+                for test_run in range(test_runs):
+                    return_ = _test_loop(model, env_id)
+                    returns.append(return_)
+            print(f'{model_name} on {env_id} returns return avg: {np.mean(returns)}, std: {np.std(returns)}')
 
 
 if __name__ == '__main__':
