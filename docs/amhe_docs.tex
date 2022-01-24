@@ -48,6 +48,9 @@
 % include pdf images
 \usepackage{pdfpages}
 
+% bold math
+\usepackage{bm}
+
 \title{Dokumentacja do projektu z AMHE}
 
 \author{Roman Moskalenko \and Pavel Tarashkevich}
@@ -143,14 +146,14 @@ W tabeli \ref{table:env_properties} znajdują się rozważane przez nas
 \begin{table}[!h]
   \begin{tabular}{lrrrr}
     \hline
-    \multicolumn{1}{c}{Środowisko} & \multicolumn{1}{c}{\# obs.} & \multicolumn{1}{c}{\# akcje} & \multicolumn{1}{c}{typ akcji} & \multicolumn{1}{c}{rozwiązanie} \\
+    \multicolumn{1}{c}{Środowisko} & \multicolumn{1}{c}{\# obs.} & \multicolumn{1}{c}{\# akcje} & \multicolumn{1}{c}{typ akcji} & \multicolumn{1}{c}{rozwiązany dla} \\
     \hline
-    CartPole-v0                    & 4                           & 2                            & dyskretna                     & 195                             \\
-    CartPole-v1                    & 4                           & 2                            & dyskretna                     & 475                             \\
-    MountainCar-v0                 & 2                           & 3                            & dyskretna                     & -110                            \\
-    MountainCarContinuous-v0       & 2                           & 1                            & ciągła                        & 90                              \\
-    Pendulum-v1                    & 3                           & 1                            & ciągła                        & -140                            \\
-    Acrobot-v1                     & 6                           & 3                            & dyskretna                     & -60                             \\
+    CartPole-v0                    & 4                           & 2                            & dyskretna                     & 195                                \\
+    CartPole-v1                    & 4                           & 2                            & dyskretna                     & 475                                \\
+    MountainCar-v0                 & 2                           & 3                            & dyskretna                     & -110                               \\
+    MountainCarContinuous-v0       & 2                           & 1                            & ciągła                        & 90                                 \\
+    Pendulum-v1                    & 3                           & 1                            & ciągła                        & -140                               \\
+    Acrobot-v1                     & 6                           & 3                            & dyskretna                     & -60                                \\
     \hline
   \end{tabular}
   \caption{
@@ -176,15 +179,15 @@ RL optymalizują swoją politykę zachowania na środowisku, potrafią
 uwzględniać natychmiastowe nagrody, a także stany i akcje, które do nich
 prowadzą.
 
-Do porównania algorytmów uwzględnimy jak szybko algorytmy osiągają
+Do porównania algorytmów uwzględniliśmy jak szybko algorytmy osiągają
 kolejne sumy nagród, ile czasu zajęło uczenie. Najważniejszą metryką
 porównania jest uśredniona suma nagród uzyskiwana  przez modele nauczone.
 
 \subsubsection{Opis modeli do nauczenia}
 
 \textbf{Algorytm neuroewolucji}: użyliśmy perceptronu
-dwuwarstwowego z 8 neuronami w warstwie ukrytej. Także perceptron ten
-zawiera dodatkowe parametry (bias). Wybraliśmy ReLU jako funkcję aktywacji.
+dwuwarstwowego z 8 neuronami w warstwie ukrytej. Perceptron ten nie zawiera
+dodatkowych parametrów bias. Wybraliśmy ReLU jako funkcję aktywacji.
 Algorytm \mbox{CMA-ES} automatycznie dobiera liczność populacji zgodnie
 ze wzorem:
 
@@ -202,7 +205,73 @@ został wybrany arbitralnie i \mbox{wynosi $1.3$}.
 modeli tych algorytmów z pakietu stable\_baselines3 z polityką
 \emph{MlpPolicy}.
 
-\subsubsection{Uczenie modeli}
+\subsubsection{Uczenie agentów}
+
+Uczenie agentów dokonywano w ciągu 500 tysięcy kroków,
+gdzie za krok uznajemy pojedynczą akcją dokonaną przez
+agenta na danym środowisku.
+
+Warto zaznaczyć, że ze względu na to, że agent
+algorytmu CMAESNN korzysta z populacji osobników niezależnie
+działających na środowisku, postanowiliśmy zliczać wykonane kroki tylko
+przez jednego osobnika, który uzyskał największą sumę nagród
+w danym epizodzie.
+
+Uczenie jest dokonane łącznie 5 razy dla każdej pary środowisko-algorytm,
+aby zmniejszyć wpływ losowości na uzyskane wyniki.
+
+Na rysunku \ref{fig:training} pokazano jeden z pięciu przebiegów uczenia
+algorytmów. Wartości na osi pionowej odpowiadają sumom nagród,
+które algorytmy uzyskują na końcu epizodu działania na danym środowisku.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.8\textwidth]{../plotting/plots/plot_all0.pdf}
+  \caption{Przebieg uczenia algorytmów w przeciągu 500,000 kroków.
+    Dla algorytmu CMAESNN pokazano zakres sum nagród, uzyskany przez
+    średnią sumę nagród oraz odchylenia standardowego dla całej populacji.}
+  \label{fig:training}
+\end{figure}
+
+\begin{table}[!h]
+  \centering
+  \hskip-1.0cm\begin{tabular}{llll}
+    \hline
+    \multicolumn{1}{c}{}     & \multicolumn{1}{c}{A2C}      & \multicolumn{1}{c}{PPO} & \multicolumn{1}{c}{CMAESNN}              \\
+    \hline
+    CartPole-v0              & \phantom{$-$}200             & \phantom{$-$}200        & \phantom{\bm{$-$}}\bm{$200$}             \\
+    CartPole-v1              & \phantom{$-$}500             & \phantom{$-$}500        & \phantom{\bm{$-$}}\bm{$500$}             \\
+    MountainCar-v0           & $-200$                       & $-200$                  & \bm{$-104.54 \pm 8.41$}                  \\
+    MountainCarContinuous-v0 & \phantom{$-$}$0.77 \pm 1.55$ & \phantom{$-$}0.0        & \phantom{\bm{$-$}}\bm{$81.20 \pm 35.97$} \\
+    Pendulum-v1              & $-843.2 \pm 237.08$          & $-1060 \pm 29.66$       & \bm{$-221 \pm 89.43$}                    \\
+    Acrobot-v1               & $-80.44 \pm 2.90$            & $-73.98 \pm 1.21$       & \bm{$-67.56 \pm 0.81$}                   \\
+    \hline
+  \end{tabular}
+  \caption{
+  }\label{table:training}
+\end{table}
+
+
+
+\subsubsection{Sprawność nauczonych agentów}
+
+\begin{table}[!h]
+  \centering
+  \hskip-1.0cm\begin{tabular}{llllr}
+    \hline
+    \multicolumn{1}{c}{}     & \multicolumn{1}{c}{A2C}         & \multicolumn{1}{c}{PPO}         & \multicolumn{1}{c}{CMAESNN}              & \multicolumn{1}{c}{} \\
+    \hline
+    CartPole-v0              & \phantom{$-$}$181.28 \pm 40.90$ & \phantom{$-$}\bm{$200 \pm 0.0}$ & \phantom{\bm{$-$}}$199.7 \pm 2.1$        &                      \\
+    CartPole-v1              & \phantom{$-$}$500 \pm 0.0$      & \phantom{$-$}$500 \pm 0.0$      & \phantom{\bm{$-$}}\bm{$500 \pm 0.0$}     &                      \\
+    MountainCar-v0           & $-200  \pm 0.0$                 & $-200 \pm 0.0$                  & \bm{$-125.82 \pm 33.43} $                &                      \\
+    MountainCarContinuous-v0 & $-0.01 \pm 0.02$                & \phantom{$-$}$0.0 \pm 0.0$      & \phantom{\bm{$-$}}\bm{$49.57 \pm 49.74$} &                      \\
+    Pendulum-v1              & $-841.44 \pm 579.90$            & $-1180.94 \pm 143.50$           & \bm{$-508.85 \pm 602.58$}                &                      \\
+    Acrobot-v1               & $-248 \pm 206.03$               & \bm{$-73.54 \pm 10.02$}         & $-82.6 \pm 21.53$                        &                      \\
+    \hline
+  \end{tabular}
+  \caption{
+  }\label{table:training}
+\end{table}
 
 \subsubsection{Wnioski}
 
