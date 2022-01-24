@@ -1,4 +1,3 @@
-from typing import Callable, List
 from os import listdir
 from os.path import isfile, join
 
@@ -7,10 +6,7 @@ import matplotlib.pyplot as plt
 
 from src.env_info import env_to_action_type
 from src.log_utils import process_cmaess_nn_logs
-
-
-def aggregate_and_apply(processed_datas: List[List], key: str, fn: Callable) -> list:
-    return [fn([r.get(key) for r in rows]) for rows in zip(*processed_datas)]
+from plotting.utils import aggregate_and_apply
 
 
 plt.style.use('ggplot')
