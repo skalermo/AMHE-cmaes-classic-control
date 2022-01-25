@@ -52,7 +52,7 @@ def main():
     train_runs = 5
     test_runs = 10
 
-    data_dir = '../.data_bias'
+    data_dir = '../.data'
     logs_dir = f'{data_dir}/logs'
     models_dir = f'{data_dir}/models'
     _create_dirs(logs_dir, models_dir)
