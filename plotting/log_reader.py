@@ -1,4 +1,3 @@
-from typing import List, Callable
 from os import listdir
 from os.path import isfile, join
 
@@ -6,21 +5,12 @@ import numpy as np
 
 from src.env_info import env_to_action_type
 from src.log_utils import process_logs, process_cmaess_nn_logs
+from plotting.utils import avg_stds
 
 
-def aggregate_and_apply(processed_datas: List[List], key: str, fn: Callable) -> list:
-    return [fn([r.get(key) for r in rows]) for rows in zip(*processed_datas)]
-
-
-def avg_stds(stds: List[float]) -> float:
-    variations = list(map(lambda x: x ** 2, stds))
-    return np.sqrt(np.mean(variations))
-
-
-log_path = '.data/logs'
+log_path = './..data/logs'
 all_logs = [f'{log_path}/{f}' for f in listdir(log_path) if isfile(join(log_path, f))]
 
-# models = ['A2C', 'PPO', 'CMAESNN']
 models = ['CMAESNN']
 
 for i, env_id in enumerate(env_to_action_type.keys()):
