@@ -4,6 +4,10 @@ This repository contains implementation of algorithm which optimizes parameters
 of neural network using Covariance Matrix Adaptation Evolution Strategy (CMA-ES)
 for solving [classic control problems](https://gym.openai.com/envs/#classic_control).
 
+## Requirements
+
+- Python 3.8
+
 ## Installation
 
 In order to run the project make sure to install the dependencies:
