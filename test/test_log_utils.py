@@ -15,7 +15,7 @@ class MyTestCase(unittest.TestCase):
     def test_extract_data(self):
         chunk = next(chunk_rollouts(self.logs))
         data = extract_data(chunk)
-        expected = {'ep_rew_mean': 16, 'iterations': 4, 'total_timesteps': 20}
+        expected = {'ep_rew_mean': 16, 'iterations': 4, 'total_timesteps': 20, 'time_elapsed': 0.0}
         self.assertDictEqual(data, expected)
 
     def test_process_logs(self):
@@ -27,6 +27,7 @@ class MyTestCase(unittest.TestCase):
             self.assertTrue('ep_rew_mean' in d)
             self.assertTrue('iterations' in d)
             self.assertTrue('total_timesteps' in d)
+            self.assertTrue('time_elapsed' in d)
 
     def test_process_cmaes_nn_logs(self):
         with open('./test/test_data/example_log_cmaesnn.txt', 'r') as f:
@@ -41,6 +42,7 @@ class MyTestCase(unittest.TestCase):
             self.assertTrue('population_avg_return' in d)
             self.assertTrue('population_return_std' in d)
             self.assertTrue('total_timesteps' in d)
+            self.assertTrue('time_elapsed' in d)
 
 
 if __name__ == '__main__':
