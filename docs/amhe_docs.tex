@@ -187,9 +187,10 @@ porównania jest uśredniona suma nagród uzyskiwana  przez modele nauczone.
 
 \textbf{Algorytm neuroewolucji}: użyliśmy perceptronu
 dwuwarstwowego z 8 neuronami w warstwie ukrytej. Perceptron ten nie zawiera
-dodatkowych parametrów bias. Wybraliśmy ReLU jako funkcję aktywacji.
-Algorytm \mbox{CMA-ES} automatycznie dobiera liczność populacji zgodnie
-ze wzorem:
+dodatkowych parametrów bias. Podliczyliśmy, że liczba parametrów perceptronu
+będzie wystarczająco mała aby móc efektywnie stosować algorytm CMAES.
+Wybraliśmy ReLU jako funkcję aktywacji.  Algorytm \mbox{CMA-ES} automatycznie
+dobiera liczność populacji zgodnie ze wzorem:
 
 \begin{equation*}
   population\_size = 4 + \floor{3 * \ln{(n)} }
@@ -226,7 +227,7 @@ które algorytmy uzyskują na końcu epizodu działania na danym środowisku.
 
 \begin{figure}[!h]
   \centering
-  \includegraphics[width=0.8\textwidth]{../plotting/plots/plot_all0.pdf}
+  \includegraphics[width=0.7\textwidth]{../plotting/plots/plot_all0.pdf}
   \caption{Przebieg uczenia algorytmów w przeciągu 500,000 kroków.
     Dla algorytmu CMAESNN pokazano zakres sum nagród, uzyskany przez
     średnią sumę nagród oraz odchylenia standardowego dla całej populacji.}
@@ -271,6 +272,22 @@ większą wariancję sum nagród w populacji dla tych środowisk.
 Resztę wykresów uczenia agentów można znaleźć w dodatku
 \ref{appendix:training}.
 
+Zostały zmierzone czasy uczenia agentów. Podajemy tylko jeden wykres,
+ponieważ pozostałe pomiary czasu były prawie identyczne. Na rysunku \ref{fig:training_time}
+wyraźnie widać liniową zależność czasu uczenia od liczby kroków. Na większości
+wykresach algorytm CMAESNN spędza dużo więcej czasu na uczenie, co
+można wytłumaczyć tym, że algorytm w przeciągu epizodu przechodzi środowisko
+tyle razy, ile osobników występuje w populacji. Z innej strony dana cecha
+algorytmu umożliwia łatwą jego skalowalność, co jest dobrze opisane
+w \cite{scalable_alternative}.
+
+\begin{figure}[!h]
+  \centering
+  \includegraphics[width=0.7\textwidth]{../plotting/plots/plot_time0.pdf}
+  \caption{Czasy uczenia ($s$) agentów w przeciągu 500,000 kroków.}
+  \label{fig:training_time}
+\end{figure}
+
 Ciekawostka: obecność wartości bias w implementacji sieci neuronowej
 algorytmu CMAESNN negatywnie wpłynęła na działanie na środowiskach
 MountainCar-v0 oraz MountainCarContinuous-v0. W dodatku \ref{appendix:bias}
@@ -303,7 +320,9 @@ uruchomione. Uśrednione (po 10 uruchomieniach) wyniki znajdują się w tabeli
   }\label{table:testing}
 \end{table}
 
-\subsubsection{Wnioski}
+Algorytm CMAESNN sprawuje się lepiej niż algorytmy A2C i PPO w domyślnych
+konfiguracjach, a co więcej rozwiązuje bądź jest bliski rozwiązania dla
+wszystkich środowisk kontroli klasycznej.
 
 \pagebreak
 \subsection{Opis struktury projektu}
@@ -374,8 +393,9 @@ w katalogu \textbf{src}:
 Wraz z implementacją projektu powstawały testy do sprawdzenia poprawności
 jego działania. Znajdują się w katalogu \textbf{test}. \\
 
-Katalog \textbf{plotting} zawiera skrypty do generowania wykresów,
-a także folder z wykresami wykorzystanymi w dokumentacji.
+Katalog \textbf{plotting} zawiera skrypty do generowania wykresów na
+podstawie przetworzonych logów, a także katalog z wykresami wykorzystanymi
+w dokumentacji.
 
 Katalog \textbf{docs} przechowuje dokumentację projektu.
 Plik \textbf{requirements.txt} zawiera listę wymaganych do zainstalowania
