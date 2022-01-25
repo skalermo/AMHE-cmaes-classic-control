@@ -128,8 +128,8 @@ perceptronu wielowarstwowego.
 \subsection{Przeprowadzone eksperymenty}
 
 Dany rozdział opisuje szczegóły przeprowadzonych w ramach projektu
-eksperymentów: opis środowisk na których działają agenty, ich uczenie oraz
-wnioski.
+eksperymentów: opis środowisk na których działają agenty, ich uczenie i
+przetestowanie.
 
 \subsubsection{Opis środowisk kontroli klasycznej}
 
@@ -288,6 +288,7 @@ w \cite{scalable_alternative}.
   \label{fig:training_time}
 \end{figure}
 
+\pagebreak
 Ciekawostka: obecność wartości bias w implementacji sieci neuronowej
 algorytmu CMAESNN negatywnie wpłynęła na działanie na środowiskach
 MountainCar-v0 oraz MountainCarContinuous-v0. W dodatku \ref{appendix:bias}
@@ -340,17 +341,22 @@ Na rysunku \ref{fig:dirtree} pokazana jest struktura projektu.
     .2 .gitignore.
     .2 docs.
     .3 amhe\_docs.tex.
+    .2 example.py.
+    .2 models.
     .2 plotting.
+    .3 log\_reader.py.
     .3 plot\_all.py.
     .3 plot\_bias\_perf.py.
+    .3 plot\_time.py.
     .3 plots.
-    .2 main.py.
+    .3 utils.py.
     .2 requirements.txt.
     .2 src.
     .3 cmaes\_nn.py.
     .3 env\_info.py.
     .3 log\_utils.py.
     .3 nn.py.
+    .3 train\_all.py.
     .2 test.
     .3 \_\_init\_\_.py.
     .3 test\_cmaes\_nn.py.
@@ -365,9 +371,10 @@ Na rysunku \ref{fig:dirtree} pokazana jest struktura projektu.
   \label{fig:dirtree}
 \end{figure}
 
-Plik \textbf{main.py} odpowiada za główny skrypt, który wykonuje uczenie
-modeli oraz zapisanie wyników uczenia: logów oraz wytrenowanych modeli
-do katalogów \textbf{.data/logs} oraz \textbf{.data/models} odpowiednio. \\
+Plik \textbf{example.py} zawiera przykładowy kod, który uruchamia nauczony
+model algorytmu CMAESNN oraz wyświetla jego działanie na wybranym środowisku.
+W katalogu \textbf{models} znajduje zestaw nauczonych modeli, z których
+korzysta ten skrypt.\\
 
 Kod źródłowy projektu, z którego jest zbudowany \textbf{main.py} znajduje się
 w katalogu \textbf{src}:
@@ -388,6 +395,9 @@ w katalogu \textbf{src}:
   \item \textbf{nn.py} - zawiera funkcje do zbudowania perceptronu
         wielowarstwowego, a także funkcje do przypisania wektora parametrów
         do wag perceptronu.
+  \item \textbf{train\_all.py} - skrypt, który wykonuje uczenie modeli
+        oraz zapisanie wyników uczenia: logów oraz wytrenowanych modeli do
+        katalogów \textbf{.data/logs} oraz \textbf{.data/models} odpowiednio.
 \end{itemize}
 
 Wraz z implementacją projektu powstawały testy do sprawdzenia poprawności
@@ -415,13 +425,13 @@ oraz zainstalowanie bibliotek znajdujących w pliku \textbf{requirements.txt}:
 
 \bigskip
 
-Następnie można uruchomić główny skrypt za pomocą polecenia:
+Następnie można przykładowy skrypt za pomocą polecenia:
 
 \begin{lstlisting}[
   backgroundcolor = \color{lightgray},
   language=bash,
 ]
-  $ python main.py
+  $ python example.py
 \end{lstlisting}
 
 Testy można uruchomić poleceniem:
@@ -431,6 +441,15 @@ Testy można uruchomić poleceniem:
   language=bash,
 ]
   $ python -m unittest discover test
+\end{lstlisting}
+
+Odpalić główny skrypt uczenia można za pomocą:
+
+\begin{lstlisting}[
+  backgroundcolor = \color{lightgray},
+  language=bash,
+]
+  $ python src/train_all.py
 \end{lstlisting}
 
 \pagebreak
