@@ -224,7 +224,7 @@ Na rysunku \ref{fig:training} pokazano jeden z pięciu przebiegów uczenia
 algorytmów. Wartości na osi pionowej odpowiadają sumom nagród,
 które algorytmy uzyskują na końcu epizodu działania na danym środowisku.
 
-\begin{figure}[h]
+\begin{figure}[!h]
   \centering
   \includegraphics[width=0.8\textwidth]{../plotting/plots/plot_all0.pdf}
   \caption{Przebieg uczenia algorytmów w przeciągu 500,000 kroków.
@@ -232,6 +232,12 @@ które algorytmy uzyskują na końcu epizodu działania na danym środowisku.
     średnią sumę nagród oraz odchylenia standardowego dla całej populacji.}
   \label{fig:training}
 \end{figure}
+
+Jako że algorytm CMAESNN jest algorytmem przeszukiwania postanowiliśmy w trakcie
+uczenia śledzić najlepszą dotychczas populację poprzez najlepszą uśrednioną wartość
+sum nagród otrzymanych przez jej osobników. Dla porównania także zapisujemy
+najlepsze sumę nagród dla algorytmów RL. Wartości te są podane w tabeli
+\ref{table:training}.
 
 \begin{table}[!h]
   \centering
@@ -247,35 +253,65 @@ które algorytmy uzyskują na końcu epizodu działania na danym środowisku.
     Acrobot-v1               & $-80.44 \pm 2.90$            & $-73.98 \pm 1.21$       & \bm{$-67.56 \pm 0.81$}                   \\
     \hline
   \end{tabular}
-  \caption{
+  \caption{ Największę sumę nagród otrzymywane przez agentów w trakcie uczenia, uśrednione
+    po pięciu przebiegach uczenia, oraz uśrednione odchylenia standardowe. Odchylenia standardowe dla CMAESNN
+    nie uwzględniają odchylenia narzucanego przez rozrzut wyników w populacji.
   }\label{table:training}
 \end{table}
 
+W pierwszych trzech środowiskach - CartPole-v0, CartPole-v1, Acrobot-v1 -
+wszystkie algorytmy relatywnie szybko osiągają sumy nagród, które
+odpowiadają rozwiązaniu środowiska (albo bliskości do niego). Kolejne trzy -
+MountainCar-v0, MountainCarContinuous-v0, Pendulum-v1 - wyraźnie sprawiają
+kłopoty dla algorytmów RL. Algorytm CMAESNN dzięki wbudowanej właściwości do
+eksploracji potrafi rozwiązać pierwsze dwa z nich oraz wykazuje się
+lepszymi wynikami w trzecim środowisku. Warto też zwrócić uwagę na dużo
+większą wariancję sum nagród w populacji dla tych środowisk.
 
+Resztę wykresów uczenia agentów można znaleźć w dodatku
+\ref{appendix:training}.
+
+Ciekawostka: obecność wartości bias w implementacji sieci neuronowej
+algorytmu CMAESNN negatywnie wpłynęła na działanie na środowiskach
+MountainCar-v0 oraz MountainCarContinuous-v0. W dodatku \ref{appendix:bias}
+można znaleźć przebiegi uczenia CMAESNN z tymi parametrami i bez nich.
+Na dane zjawisko zwrócono też uwagę w \cite{analyzing_reinforcement}.
 
 \subsubsection{Sprawność nauczonych agentów}
 
+Po nauczeniu agentów przetestowaliśmy sprawność ich działania.
+Wszystkie 5 nauczonych wersji agentów z poprzedniego rozdziału zostały
+uruchomione. Uśrednione (po 10 uruchomieniach) wyniki znajdują się w tabeli
+\ref{table:testing}.
+
 \begin{table}[!h]
   \centering
-  \hskip-1.0cm\begin{tabular}{llllr}
+  \begin{tabular}{llllr}
     \hline
-    \multicolumn{1}{c}{}     & \multicolumn{1}{c}{A2C}         & \multicolumn{1}{c}{PPO}         & \multicolumn{1}{c}{CMAESNN}              & \multicolumn{1}{c}{} \\
+    \multicolumn{1}{c}{}     & \multicolumn{1}{c}{A2C}         & \multicolumn{1}{c}{PPO} & \multicolumn{1}{c}{CMAESNN}              & \multicolumn{1}{c}{} \\
     \hline
-    CartPole-v0              & \phantom{$-$}$181.28 \pm 40.90$ & \phantom{$-$}\bm{$200 \pm 0.0}$ & \phantom{\bm{$-$}}$199.7 \pm 2.1$        &                      \\
-    CartPole-v1              & \phantom{$-$}$500 \pm 0.0$      & \phantom{$-$}$500 \pm 0.0$      & \phantom{\bm{$-$}}\bm{$500 \pm 0.0$}     &                      \\
-    MountainCar-v0           & $-200  \pm 0.0$                 & $-200 \pm 0.0$                  & \bm{$-125.82 \pm 33.43} $                &                      \\
-    MountainCarContinuous-v0 & $-0.01 \pm 0.02$                & \phantom{$-$}$0.0 \pm 0.0$      & \phantom{\bm{$-$}}\bm{$49.57 \pm 49.74$} &                      \\
-    Pendulum-v1              & $-841.44 \pm 579.90$            & $-1180.94 \pm 143.50$           & \bm{$-508.85 \pm 602.58$}                &                      \\
-    Acrobot-v1               & $-248 \pm 206.03$               & \bm{$-73.54 \pm 10.02$}         & $-82.6 \pm 21.53$                        &                      \\
+    CartPole-v0              & \phantom{$-$}$181.28 \pm 40.90$ & \phantom{$-$}\bm{$200}$ & \phantom{\bm{$-$}}$199.7 \pm 2.1$        &                      \\
+    CartPole-v1              & \phantom{$-$}$500$              & \phantom{$-$}$500$      & \phantom{\bm{$-$}}\bm{$500$}             &                      \\
+    MountainCar-v0           & $-200$                          & $-200$                  & \bm{$-125.82 \pm 33.43} $                &                      \\
+    MountainCarContinuous-v0 & $-0.01 \pm 0.02$                & \phantom{$-$}$0.0$      & \phantom{\bm{$-$}}\bm{$49.57 \pm 49.74$} &                      \\
+    Pendulum-v1              & $-841.44 \pm 579.90$            & $-1180.94 \pm 143.50$   & \bm{$-508.85 \pm 602.58$}                &                      \\
+    Acrobot-v1               & $-248 \pm 206.03$               & \bm{$-73.54 \pm 10.02$} & $-82.6 \pm 21.53$                        &                      \\
     \hline
   \end{tabular}
-  \caption{
-  }\label{table:training}
+  \caption{ Sumy nagród nauczonych agentów uśrednione po 10 uruchomieniach
+    wraz z uśrednionym odchyleniem standardowym.
+  }\label{table:testing}
 \end{table}
 
 \subsubsection{Wnioski}
 
+\pagebreak
 \subsection{Opis struktury projektu}
+
+Kod źródłowy projektu jest umieszczony w repozytorium GitHub na stronie
+\href{https://github.com/skalermo/AMHE-cmaes-classic-control}
+{https://github.com/skalermo/AMHE-cmaes-classic-control}
+\medskip
 
 Na rysunku \ref{fig:dirtree} pokazana jest struktura projektu.
 
@@ -377,9 +413,6 @@ Testy można uruchomić poleceniem:
   $ python -m unittest discover test
 \end{lstlisting}
 
-% \appendix
-% \section{Wykresy uczenia modeli}
-
 \pagebreak
 \begin{thebibliography}{9}
   \bibitem{scalable_alternative}
@@ -402,7 +435,7 @@ Testy można uruchomić poleceniem:
 
 \pagebreak
 \appendix
-\section{Wykresy uczenia algorymów}
+\section{Wykresy uczenia algorymów}\label{appendix:training}
 
 \begin{figure}[ht!]
   \centering
@@ -438,7 +471,7 @@ Testy można uruchomić poleceniem:
 \end{figure}
 
 \pagebreak
-\section{Wpływ bias'u na uczenie CMAESNN}
+\section{Wpływ bias'u na uczenie CMAESNN}\label{appendix:bias}
 
 \begin{figure}[ht!]
   \centering
@@ -469,8 +502,6 @@ Testy można uruchomić poleceniem:
   \caption{Pięć niezależnych przebiegów uczenia algorytmów CMAESNN
     z (niebieski) i bez (czerwony) dodatkowymi parametrami bias.
     Uczenie dokonywało się w przeciągu 500,000 kroków.}
-  \label{}
-
 \end{figure}
 
 \end{document}
