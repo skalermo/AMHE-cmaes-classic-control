@@ -42,7 +42,8 @@ def extract_data(chunk: str) -> dict:
     # | policy_loss | 2.07 |
     # | value_loss | 10.7 |
     # ------------------------------------
-    data = {'ep_rew_mean': None, 'iterations': None, 'total_timesteps': None}
+    data = {'ep_rew_mean': None, 'iterations': None,
+            'total_timesteps': None, 'time_elapsed': None}
     for line in chunk.split('\n'):
         words = line.split()
         if len(words) >= 2 and words[1].strip() in data.keys():
@@ -65,8 +66,10 @@ def process_cmaess_nn_logs(logs: str) -> list:
     for line in lines:
         if not line:
             continue
-        # episode = 1 population_best_return = 9.0 population_avg_return = 11.375 population_return_std = 2.6896793489187516 total_timesteps = 8
-        _data = {'episode': None, 'population_best_return': None, 'population_avg_return': None, 'population_return_std': None, 'total_timesteps': None}
+        # episode = 1 population_best_return = 9.0 population_avg_return = 11.375 population_return_std = 2.6896793489187516 total_timesteps = 8 time_elapsed=0
+        _data = {'episode': None, 'population_best_return': None,
+                 'population_avg_return': None, 'population_return_std': None,
+                 'total_timesteps': None, 'time_elapsed': None}
         words = line.split()
         for word in words:
             k, v = word.split('=')
