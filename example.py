@@ -9,7 +9,7 @@ def main():
     env = gym.make(env_id)
     obs = env.reset()
 
-    saved_model_path = f'./.data/models/{env_id}_CMAESNN_0.zip'
+    saved_model_path = f'./models/{env_id}_CMAESNN_0.zip'
     if (model := CMAESNN.load(saved_model_path)) is None:
         print('Model not found. Please train the model first.')
         model = CMAESNN(env_id, verbose=True)
